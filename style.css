@@ -7,3 +7,5 @@
 .catalogue button.catalogue-selected,.catalogue button.catalogue-selected:hover{border:2px solid #63dfff;background:#203c4e;box-shadow:0 0 0 1px #63dfff44,inset 0 0 22px #31c8f022,0 0 14px #3ddaf044;position:relative}
 .catalogue button.catalogue-selected::after{content:'✓ SELECTED';position:absolute;top:5px;right:7px;color:#9af2ff;font-size:8px;font-weight:800;letter-spacing:.6px}
 .catalogue button.catalogue-selected .itemname{color:#c7f8ff}
+
+.tabs{grid-template-columns:repeat(5,minmax(0,1fr))}.tabs button{font-size:10px}.catalogue-hint{font-size:11px;color:#aab7cc;line-height:1.6;padding:10px 4px}.catalogue button.starter-card{height:auto;min-height:124px;padding:12px 8px}.catalogue button.starter-card .symbol{font-size:25px!important}.catalogue button.starter-card .itemname{font-size:12px}.catalogue button.starter-card .itemmeta{white-space:normal;line-height:1.4;max-height:48px;overflow:hidden;text-align:center}
