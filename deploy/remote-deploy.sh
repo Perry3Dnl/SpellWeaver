@@ -11,6 +11,7 @@ NETWORK=dummy-stock-simulator_default
 CADDY_CONTAINER=dummy-stock-caddy
 RELEASE_DIR="$APP_DIR/releases/$REVISION"
 ARCHIVE="$APP_DIR/.release-$REVISION.tar.gz"
+RUNTIME_ENV="$APP_DIR/private/runtime.env"
 
 # Docker privilege is established without changing any services.
 if docker info >/dev/null 2>&1; then
@@ -23,6 +24,8 @@ else
 fi
 
 [ -s "$ARCHIVE" ] || { echo 'Missing release archive' >&2; exit 1; }
+[ -s "$RUNTIME_ENV" ] || { echo 'Missing private runtime configuration; original service unaffected' >&2; exit 1; }
+[ "$(stat -c %a "$RUNTIME_ENV")" = "600" ] || { echo 'Insecure runtime permissions' >&2; exit 1; }
 "${DOCKER[@]}" container inspect "$CADDY_CONTAINER" >/dev/null || { echo 'Expected shared Caddy instance is unavailable; no changes made' >&2; exit 1; }
 "${DOCKER[@]}" network inspect "$NETWORK" >/dev/null || { echo 'Expected shared network missing; no changes made' >&2; exit 1; }
 [ -f "$CADDYFILE" ] || { echo 'Shared Caddyfile not found; no changes made' >&2; exit 1; }
@@ -64,15 +67,16 @@ trap cleanup_candidate EXIT
   --network-alias spellweaver-web \
   --read-only --cap-drop ALL --security-opt no-new-privileges \
   --user 65534:65534 \
-  --pids-limit 100 --memory 128m \
+  --pids-limit 100 --memory 256m \
+  --env-file "$RUNTIME_ENV" \
   -v "$RELEASE_DIR:/site:ro" \
   --workdir /site \
   python:3.12-alpine \
-  python3 -m http.server 8080 --bind 0.0.0.0 --directory /site >/dev/null
+  python3 /site/server.py >/dev/null
 
 READY=false
 for attempt in $(seq 1 20); do
-  if "${DOCKER[@]}" exec "$CANDIDATE" python3 -c 'import json,urllib.request; assert json.load(urllib.request.urlopen("http://127.0.0.1:8080/version.json", timeout=3))["revision"]'" == '$REVISION'" 2>/dev/null;then
+  if "${DOCKER[@]}" exec "$CANDIDATE" python3 -c 'import json,urllib.request; assert json.load(urllib.request.urlopen("http://127.0.0.1:8080/version.json", timeout=3))["revision"]'" == '$REVISION'"; then
     READY=true;break
   fi
   sleep 1
