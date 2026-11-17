@@ -27,15 +27,17 @@ function selectedCatalogueEntry(){
  return null;
 }
 function catalogueKey(v){return tab==='elements'?v.id:tab==='runes'?v.letter:v.name}
-function syncCatalogueToSelection(){
+function focusCatalogueOnSelection(){
  const entry=selectedCatalogueEntry();
  if(!entry)return;
- if(tab!==entry.tab){
-  tab=entry.tab;
-  search='';
-  $('search').value='';
- }
+ tab=entry.tab;
+ search='';
+ $('search').value='';
+}
+function syncCatalogueToSelection(){
+ const entry=selectedCatalogueEntry();
  for(const button of $('tabs').querySelectorAll('button'))button.classList.toggle('active',button.dataset.tab===tab);
+ if(!entry || tab!==entry.tab)return;
  const selectedItem=(tab==='elements'?elements:tab==='runes'?RUNES:tab==='rings'?RINGS:AMPS).find(v=>catalogueKey(v)===entry.key);
  if(selectedItem && !`${selectedItem.name} ${selectedItem.symbol||''} ${selectedItem.code||''} ${selectedItem.letter||''}`.toLowerCase().includes(search.toLowerCase())){
   search='';
@@ -121,7 +123,7 @@ if(selected.type==='rune'){el.append(document.createTextNode(` ${RUNES.find(r=>r
 if(selected.type==='amp'){el.append(document.createTextNode('Choose an Amp tier in Components on the left.'),selectOpts('Host ring',obj.ringId,spell.rings.map(r=>[r.id,`Ring ${r.id}`]),v=>{if(ampConflict(spell.amps,Number(v),obj.angle,obj.id)){toast('Same-axis Amp conflict with adjacent ring');return false}commit();obj.ringId=Number(v)}),selectOpts('Diagonal axis',obj.angle,AXES.map(a=>[a,`${a}°`]),v=>{if(ampConflict(spell.amps,obj.ringId,Number(v),obj.id)){toast('Axis occupied on same or neighboring ring');return false}commit();obj.angle=Number(v)}))}}
 function toPoint(e){const box=canvas.getBoundingClientRect(),s=viewScale();return [250+((e.clientX-box.left)/box.width*500-250)/s,250+((e.clientY-box.top)/box.height*500-250)/s]}
 function pick(pt){const [x,y]=pt,centerDist=Math.hypot(x-250,y-250);if(centerDist<38)return {type:'center'};let best=null,bestD=22/viewScale();for(const type of ['element','rune','amp'])for(const o of spell[`${type}s`]){const r=ring(o.ringId);if(!r)continue;let rr=r.radius+(type==='rune'?(o.side==='before'?-25:25):0),p=polar(o.angle,rr),d=Math.hypot(x-p[0],y-p[1]);if(d<bestD){best={type,id:o.id};bestD=d}}for(const r of spell.rings){const d=Math.abs(centerDist-r.radius);if(d<Math.min(bestD,10/viewScale())){best={type:'ring',id:r.id};bestD=d}}return best}
-canvas.addEventListener('pointerdown',e=>{const p=toPoint(e);if(false){commit();drawing={id:id(),points:[p],width:1.6};spell.strokes.push(drawing);canvas.setPointerCapture(e.pointerId)}else if(false){const before=spell.strokes.length;const strokes=spell.strokes.filter(s=>!s.points.some(([x,y])=>Math.hypot(x-p[0],y-p[1])<8));if(strokes.length!==before){commit();spell.strokes=strokes;toast('Stroke erased')}else{selected=pick(p);deleteSelection()}update()}else{selected=pick(p);if(selected){canvas.setPointerCapture(e.pointerId)}update()}});
+canvas.addEventListener('pointerdown',e=>{const p=toPoint(e);if(false){commit();drawing={id:id(),points:[p],width:1.6};spell.strokes.push(drawing);canvas.setPointerCapture(e.pointerId)}else if(false){const before=spell.strokes.length;const strokes=spell.strokes.filter(s=>!s.points.some(([x,y])=>Math.hypot(x-p[0],y-p[1])<8));if(strokes.length!==before){commit();spell.strokes=strokes;toast('Stroke erased')}else{selected=pick(p);deleteSelection()}update()}else{selected=pick(p);focusCatalogueOnSelection();if(selected){canvas.setPointerCapture(e.pointerId)}update()}});
 canvas.addEventListener('pointermove',e=>{if(e.buttons!==1)return;const p=toPoint(e);if(false&&drawing){drawing.points.push(p);paint();return}if(selected&&selected.type!=='center'){const o=object();if(!o||!['element','rune','amp'].includes(selected.type))return;const a=(Math.atan2(p[1]-250,p[0]-250)*180/Math.PI+90+360)%360;if(selected.type==='amp'){let closest=AXES.reduce((best,b)=>Math.abs(b-a)<Math.abs(best-a)?b:best,45);if(closest!==o.angle&&!ampConflict(spell.amps,o.ringId,closest,o.id)){if(!o._dragged){commit();o._dragged=true}o.angle=closest}}else{if(!o._dragged){commit();o._dragged=true}o.angle=Math.round(a)}paint()}});
 canvas.addEventListener('pointerup',()=>{drawing=null;for(const arr of [spell.elements,spell.runes,spell.amps])for(const x of arr)delete x._dragged;update()});
 function deleteSelection(){if(!selected)return;const type=selected.type;if(type==='center'){toast('Center is mandatory; select Void instead');return}if(type==='ring'&&spell.rings.length===1){toast('At least one ring is required');return}commit();spell[`${type}s`]=spell[`${type}s`].filter(x=>x.id!==selected.id);if(type==='ring'){for(const key of ['elements','runes','amps'])spell[key]=spell[key].filter(x=>x.ringId!==selected.id)}selected=null;update()}
@@ -136,7 +138,7 @@ $('save-spell').onclick=()=>{if(issueList().length){toast('Fix structural warnin
 $('record-card').onclick=()=>{const c=document.createElement('canvas');c.width=c.height=500;const g=c.getContext('2d');g.strokeStyle='#000';setView(g,Math.min(1,230/(Math.max(0,...spell.rings.map(r=>r.radius))+42)));renderSpell(g,spell,elements,{guides:false});g.resetTransform();const binary=g.getImageData(0,0,500,500).data;const packed=[];for(let i=3;i<binary.length;i+=4)if(binary[i]>127)packed.push((i-3)/4);download('spellweaver-ink-card.json',JSON.stringify({schema:'spellweaver.ink-card.v1',width:500,height:500,filledPixels:packed,name:spell.name,sourceRulesVersion:'v37'},null,0));toast('500 × 500 binary ink card recorded')};
 for(const button of $('tabs').querySelectorAll('button'))button.onclick=()=>{tab=button.dataset.tab;search='';$('search').value='';for(const x of $('tabs').querySelectorAll('button'))x.classList.toggle('active',x===button);catalogue()};$('search').oninput=e=>{search=e.target.value;catalogue()};
 // Dedicated origin selector: exactly one element, with visible Void fallback.
-canvas.addEventListener('dblclick',e=>{const p=toPoint(e);if(Math.hypot(p[0]-250,p[1]-250)<35){selected={type:'center'};update()}});
+canvas.addEventListener('dblclick',e=>{const p=toPoint(e);if(Math.hypot(p[0]-250,p[1]-250)<35){selected={type:'center'};focusCatalogueOnSelection();update()}});
 selected={type:'center'};catalogue();update();
 
 window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(e.target?.tagName))return;if(e.key==='Delete'||e.key==='Backspace'){if(selected)deleteSelection()}else if(e.key==='Escape'){selected=null;update()}});
