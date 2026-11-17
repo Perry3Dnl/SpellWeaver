@@ -81,6 +81,7 @@ class ServerTests(unittest.TestCase):
         self.assertIn('SESSION_SECRET = secrets.token_urlsafe(48)', source)
         self.assertNotIn('SPELLWEAVER_SESSION_SECRET', source)
         self.assertNotIn('SPELLWEAVER_SESSION_SECRET', workflow)
+        self.assertNotIn('SPELLWEAVER_DEMO_PASSWORD', workflow)
         self.assertTrue(sw.config_ready())
         previous=sw.PASSWORD
         try:
