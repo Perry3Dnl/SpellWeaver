@@ -1,0 +1,9 @@
+# This is the isolated SpellWeaver site block that the deployment script
+# appends inside its own markers. The complete existing Caddyfile is preserved.
+# Do not replace the server Caddyfile with this fragment.
+spellweaver.perry3d.nl {
+    encode zstd gzip
+    header X-Content-Type-Options nosniff
+    header Referrer-Policy "strict-origin-when-cross-origin"
+    reverse_proxy spellweaver-web:8080
+}
