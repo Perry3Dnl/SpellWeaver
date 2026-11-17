@@ -18,7 +18,7 @@ from urllib.parse import urlsplit
 
 ROOT = Path(os.environ.get("SPELLWEAVER_SITE", "/site")).resolve()
 USERNAME = os.environ.get("SPELLWEAVER_DEMO_USERNAME", "bob")
-PASSWORD = os.environ.get("SPELLWEAVER_DEMO_PASSWORD", "")
+PASSWORD = "1223"  # simple shared demo login requested by the owner
 SESSION_SECRET = secrets.token_urlsafe(48)  # ephemeral per-process; restart requires login again
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 MODEL = os.environ.get("OPENAI_MODEL", "gpt-4.1-mini")
