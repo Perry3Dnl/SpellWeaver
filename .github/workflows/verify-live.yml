@@ -36,9 +36,9 @@ jobs:
           curl -fsSL --max-time 20 "$base/login.js" | grep -Fq '/api/login'
           # Public login is checked without putting the shared demo credential in CI logs.
           curl -fsSL --max-time 20 "$base/api/session" >/tmp/sw-session-public.json
-                    python3 - <<'PY'
+          python3 - <<'PY'
           import json
-          session=json.load(open('/tmp/sw-session.json'))
+          session=json.load(open('/tmp/sw-session-public.json'))
           assert session.get('authenticated') is False
           assert isinstance(session.get('aiEnabled'), bool)
           PY
