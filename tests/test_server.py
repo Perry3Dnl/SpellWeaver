@@ -80,10 +80,10 @@ class ServerTests(unittest.TestCase):
         self.assertFalse(sw.valid_token(tok[:-1]+("a" if tok[-1]!="a" else "b")))
     def test_interpret_validation_happens_before_provider(self):
         for spell in [{}, {"schema":"spellweaver.creation.v1","rings":[]}, 
-                      {"schema":"spellweaver.creation.v1",**{k:[] for k in ("rings","elements","runes","amps","cards","strokes")}}]:
+                      {"schema":"spellweaver.creation.v1","rings":[{}]*121,**{k:[] for k in ("elements","runes","amps","cards","strokes")}}]:
             if not spell.get("schema"):
                 with self.assertRaises(ValueError): sw.interpret(spell)
-            elif not all(k in spell for k in ("rings","elements","runes","amps","cards","strokes")):
+            else:
                 with self.assertRaises(ValueError): sw.interpret(spell)
     def test_runtime_configuration_is_not_embedded_in_static(self):
         source=(Path(__file__).resolve().parents[1] / "server.py").read_text()
