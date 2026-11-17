@@ -173,7 +173,8 @@ class Handler(BaseHTTPRequestHandler):
         return self.file(path.lstrip("/") or "index.html")
     def file(self, filename):
         path = (ROOT / filename).resolve()
-        if not path.is_relative_to(ROOT) or not path.is_file() or filename.startswith("."):
+        if (not path.is_relative_to(ROOT) or not path.is_file() or filename.startswith(".")
+                or path.suffix not in (".html", ".js", ".css", ".json", ".svg", ".png", ".ico")):
             return self.send_json(404, {"error": "Not found"})
         mime = {".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json",
                 ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon"}.get(path.suffix, "application/octet-stream")
