@@ -14,6 +14,9 @@ jobs:
     timeout-minutes: 20
     environment: production
     env:
+      SPELLWEAVER_DEMO_PASSWORD: ${{ secrets.SPELLWEAVER_DEMO_PASSWORD }}
+      SPELLWEAVER_SESSION_SECRET: ${{ secrets.SPELLWEAVER_SESSION_SECRET }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
       DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
       DEPLOY_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
@@ -29,12 +32,57 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for key in DEPLOY_HOST DEPLOY_USER DEPLOY_PASSWORD DEPLOY_HOST_KEY_FINGERPRINT; do
+          for key in DEPLOY_HOST DEPLOY_USER DEPLOY_PASSWORD DEPLOY_HOST_KEY_FINGERPRINT SPELLWEAVER_DEMO_PASSWORD SPELLWEAVER_SESSION_SECRET OPENAI_API_KEY; do
             test -n "${!key:-}" || { echo "Missing $key" >&2; exit 1; }
           done
           [[ "$DEPLOY_HOST" =~ ^[a-zA-Z0-9.-]+$ ]]
           [[ "$DEPLOY_USER" =~ ^[a-zA-Z_][a-zA-Z0-9_.-]*$ ]]
           [[ "$DEPLOY_PORT" =~ ^[0-9]+$ ]]
+          test "${#SPELLWEAVER_SESSION_SECRET}" -ge 32 || { echo "Session signing key too short" >&2; exit 1; }
+          case "$SPELLWEAVER_DEMO_PASSWORD$SPELLWEAVER_SESSION_SECRET$OPENAI_API_KEY" in *
+      - name: Upload isolated release with pinned SSH identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq sshpass
+          mkdir -p "$RUNNER_TEMP/sw-ssh"
+          chmod 700 "$RUNNER_TEMP/sw-ssh"
+          printf '%s\n' "$DEPLOY_PASSWORD" > "$RUNNER_TEMP/sw-ssh/password"
+          chmod 600 "$RUNNER_TEMP/sw-ssh/password"
+          ssh-keyscan -T 15 -p "$DEPLOY_PORT" -t ed25519 "$DEPLOY_HOST" > "$RUNNER_TEMP/sw-ssh/known_hosts" 2>/dev/null
+          test -s "$RUNNER_TEMP/sw-ssh/known_hosts"
+          test "$(ssh-keygen -lf "$RUNNER_TEMP/sw-ssh/known_hosts" -E sha256 | awk 'NR==1 {print $2}')" = "$DEPLOY_HOST_KEY_FINGERPRINT" || { echo 'SSH host fingerprint mismatch' >&2; exit 1; }
+          SSH_OPTS=(-o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/sw-ssh/known_hosts" -o PubkeyAuthentication=no -o PreferredAuthentications=password,keyboard-interactive -p "$DEPLOY_PORT")
+          remote="$DEPLOY_USER@$DEPLOY_HOST"
+          # Secrets are never placed in the repository, static release or shell arguments.
+          umask 077
+          printf 'SPELLWEAVER_DEMO_USERNAME=bob\nSPELLWEAVER_DEMO_PASSWORD=%s\nSPELLWEAVER_SESSION_SECRET=%s\nOPENAI_API_KEY=%s\n' \
+            "$SPELLWEAVER_DEMO_PASSWORD" "$SPELLWEAVER_SESSION_SECRET" "$OPENAI_API_KEY" > "$RUNNER_TEMP/sw-ssh/runtime.env"
+          tar -czf "$RUNNER_TEMP/spellweaver.tar.gz" -C dist .
+          # This transfer touches only /opt/spellweaver. It never overwrites the shared Caddyfile.
+          sshpass -f "$RUNNER_TEMP/sw-ssh/password" ssh "${SSH_OPTS[@]}" "$remote" "mkdir -p /opt/spellweaver/deploy /opt/spellweaver/private && chmod 700 /opt/spellweaver/private"
+          sshpass -f "$RUNNER_TEMP/sw-ssh/password" scp -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/sw-ssh/known_hosts" -o PubkeyAuthentication=no -o PreferredAuthentications=password,keyboard-interactive -P "$DEPLOY_PORT" \
+            "$RUNNER_TEMP/sw-ssh/runtime.env" "$remote:/opt/spellweaver/private/runtime.env"
+          sshpass -f "$RUNNER_TEMP/sw-ssh/password" scp -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/sw-ssh/known_hosts" -o PubkeyAuthentication=no -o PreferredAuthentications=password,keyboard-interactive -P "$DEPLOY_PORT" \
+            "$RUNNER_TEMP/spellweaver.tar.gz" "$remote:/opt/spellweaver/.release-$GITHUB_SHA.tar.gz"
+          sshpass -f "$RUNNER_TEMP/sw-ssh/password" scp -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/sw-ssh/known_hosts" -o PubkeyAuthentication=no -o PreferredAuthentications=password,keyboard-interactive -P "$DEPLOY_PORT" \
+            deploy/remote-deploy.sh deploy/caddy-update.py "$remote:/opt/spellweaver/deploy/"
+          sshpass -f "$RUNNER_TEMP/sw-ssh/password" ssh "${SSH_OPTS[@]}" "$remote" "bash /opt/spellweaver/deploy/remote-deploy.sh '$GITHUB_SHA'"
+      - name: Verify domain serves exact deployed revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 15); do
+            if curl -fsSL --max-time 12 -H 'Cache-Control: no-cache' "https://spellweaver.perry3d.nl/version.json?revision=$GITHUB_SHA" | grep -Fq "$GITHUB_SHA";then
+              test "$(curl -sS --max-time 12 -o /dev/null -w '%{http_code}' https://spellweaver.perry3d.nl/)" = "401" || exit 1
+              curl -fsSL --max-time 12 https://spellweaver.perry3d.nl/login | grep -Fq 'SpellWeaver' && exit 0
+            fi
+            sleep 3
+          done
+          echo 'Live revision verification failed; inspect isolated service and existing Caddy route.' >&2
+          exit 1
+\\n'*) echo "Multiline secrets are unsupported" >&2; exit 1;; esac
       - name: Upload isolated release with pinned SSH identity
         shell: bash
         run: |
