@@ -150,12 +150,24 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(200, {"authenticated": self.identity(), "aiEnabled": bool(OPENAI_API_KEY)})
         if path == "/health":
             return self.send_json(200 if config_ready() else 503, {"ready": config_ready()})
+        if path == "/version.json":
+            return self.file("version.json")
         if not self.identity():
-            if path == "/login" or path == "/login.html":
-                return self.file("login.html")
+            if path in ("/login", "/login.html", "/login.js", "/login.css"):
+                return self.file(path.lstrip("/") if path in ("/login.js", "/login.css") else "login.html")
+            if path in ("/", "/index.html"):
+                self.send_response(302)
+                self.headers_common()
+                self.send_header("Location", "/login")
+                self.end_headers()
+                return
             return self.send_json(401, {"error": "Login required"})
         if path in ("/login", "/login.html"):
-            self.send_response(302); self.headers_common(); self.send_header("Location", "/"); self.end_headers(); return
+            self.send_response(302)
+            self.headers_common()
+            self.send_header("Location", "/")
+            self.end_headers()
+            return
         if path.startswith("/api/"):
             return self.send_json(404, {"error": "Unknown endpoint"})
         return self.file(path.lstrip("/") or "index.html")
