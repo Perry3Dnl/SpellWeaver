@@ -50,7 +50,7 @@ function catalogue(){
  for(const v of values.filter(v=>`${v.name} ${v.symbol||''} ${v.code||''} ${v.letter||''}`.toLowerCase().includes(search.toLowerCase()))){
   const b=document.createElement('button');
   const active=current?.tab===tab && current.key===catalogueKey(v);
-  if(tab==='cards')b.classList.add('starter-card');
+  if(tab==='cards'){b.classList.add('starter-card');b.title=v.description;b.setAttribute('aria-description',v.description)}
   b.classList.toggle('catalogue-selected',active);
   b.setAttribute('aria-pressed',String(active));
   if(active)b.setAttribute('aria-label',`${v.name} — selected`);
