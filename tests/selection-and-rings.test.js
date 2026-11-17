@@ -25,3 +25,17 @@ test('required center stays protected when deleting',()=>{
  assert.match(app,/if\(type==='center'\)/);
  assert.match(app,/selected\.type==='center'/);
 });
+
+test('selected component identity is edited from left catalogue with persistent highlight',()=>{
+ assert.match(app,/function selectedCatalogueEntry\(/);
+ assert.match(app,/function syncCatalogueToSelection\(/);
+ assert.match(app,/catalogue-selected/);
+ assert.match(app,/aria-pressed/);
+ assert.match(app,/o\.id=v\.id/);
+ assert.match(app,/o\.elementId=v\.id/);
+ assert.match(app,/o\.pattern=v\.name/);
+ assert.match(app,/o\.letter=v\.letter/);
+ assert.match(app,/o\.tier=v\.name/);
+ assert.doesNotMatch(app,/selectOpts\('At spell origin'/);
+ assert.match(app,/Choose the central element in the highlighted Components catalogue on the left/);
+});
