@@ -19,7 +19,7 @@ from urllib.parse import urlsplit
 ROOT = Path(os.environ.get("SPELLWEAVER_SITE", "/site")).resolve()
 USERNAME = os.environ.get("SPELLWEAVER_DEMO_USERNAME", "bob")
 PASSWORD = os.environ.get("SPELLWEAVER_DEMO_PASSWORD", "")
-SESSION_SECRET = os.environ.get("SPELLWEAVER_SESSION_SECRET", "")
+SESSION_SECRET = secrets.token_urlsafe(48)  # ephemeral per-process; restart requires login again
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 MODEL = os.environ.get("OPENAI_MODEL", "gpt-4.1-mini")
 HOST = os.environ.get("SPELLWEAVER_HOST", "0.0.0.0")
@@ -32,7 +32,7 @@ usage = defaultdict(deque)
 mutex = threading.Lock()
 
 def config_ready():
-    return bool(PASSWORD and SESSION_SECRET and len(SESSION_SECRET) >= 32)
+    return bool(PASSWORD)
 
 def token():
     stamp = str(int(time.time()))
