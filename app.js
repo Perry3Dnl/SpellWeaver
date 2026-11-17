@@ -35,15 +35,9 @@ function focusCatalogueOnSelection(){
  $('search').value='';
 }
 function syncCatalogueToSelection(){
- const entry=selectedCatalogueEntry();
  for(const button of $('tabs').querySelectorAll('button'))button.classList.toggle('active',button.dataset.tab===tab);
- if(!entry || tab!==entry.tab)return;
- const selectedItem=(tab==='elements'?elements:tab==='runes'?RUNES:tab==='rings'?RINGS:AMPS).find(v=>catalogueKey(v)===entry.key);
- if(selectedItem && !`${selectedItem.name} ${selectedItem.symbol||''} ${selectedItem.code||''} ${selectedItem.letter||''}`.toLowerCase().includes(search.toLowerCase())){
-  search='';
-  $('search').value='';
- }
 }
+
 function catalogue(){
  syncCatalogueToSelection();
  const el=$('catalogue');
@@ -63,6 +57,7 @@ function catalogue(){
   b.append(symbol,name,meta);b.onclick=()=>addComponent(v);el.append(b);
  }
  if(!el.children.length)el.textContent='No matching components.';
+ const active=el.querySelector('.catalogue-selected');if(active)active.scrollIntoView({block:'nearest',inline:'nearest'});
 }
 
 function addComponent(v){
