@@ -12,11 +12,11 @@ Browser-first, dependency-free SpellWeaver spell creator based on **Spellwaving 
 
 ### Known limitations
 
-Canonical machine-readable stroke definitions for Mana, Void, Light, Darkness, Holy and Unholy are not finalized; their displayed drawings are **provisional** and should not be treated as approved executable signatures. The 26 A–Z rune **icons are placeholders**, since the canonical rune drawings are similarly pending. Ring modifier geometries approximate the working visual families and **are not deterministic pattern recognition**. Component metadata informs visual editing; raw ink interpretation, target selection, full-card placements, embedded cards and game economy are not implemented. The browser frontend has no backend, account support or OpenAI API calls. Saving to the personal spellbook here creates a downloadable draft snapshot, without gameplay inventory usage or in-game executable behavior. The existing document defines these as follow-on tasks.
+Canonical machine-readable stroke definitions for Mana, Void, Light, Darkness, Holy and Unholy are not finalized; their displayed drawings are **provisional** and should not be treated as approved executable signatures. The 26 A–Z rune **icons are placeholders**, since the canonical rune drawings are similarly pending. Ring modifier geometries approximate the working visual families and **are not deterministic pattern recognition**. Component metadata informs visual editing; raw ink interpretation, target selection, full-card placements, embedded cards and game economy are not implemented. The production demo has a protected Python backend with a single demo login and a limited OpenAI interpretation endpoint; it is not a full player account system. Saving to the personal spellbook here creates a downloadable draft snapshot, without gameplay inventory usage or in-game executable behavior. The existing document defines these as follow-on tasks.
 
 ## Run and test
 
-Node.js 22 recommended (no external npm dependencies). Run `npm run check` for tests and the build. Serve `dist/` using a static server (e.g. `python3 -m http.server 8080 --directory dist`), then open `http://localhost:8080`. Static JSON imports require an HTTP server, not `file://`.
+Node.js 22 recommended (no external npm dependencies). Run `npm run check` for tests and the build. The checked-in static files remain build artifacts, but the private demo now requires the Python server: set `SPELLWEAVER_DEMO_PASSWORD`, `SPELLWEAVER_SESSION_SECRET` (at least 32 characters), and `OPENAI_API_KEY` in your environment, then run `SPELLWEAVER_SITE=dist SPELLWEAVER_HOST=127.0.0.1 SPELLWEAVER_ORIGIN=http://localhost:8080 python3 dist/server.py`. The production cookie is Secure, so login requires HTTPS in production; use HTTPS for integration testing. `npm run check` runs all source, backend and deployment checks.
 
 ## Deployment / Caddy safety
 
@@ -53,3 +53,21 @@ Click a selected ring, then repeatedly click material cards to place copies, aut
 ### Catalogue card click behavior
 
 For both **Materials** and **Cards**, a single click edits/replaces the currently selected card when no placement ring is active. **Double-click** adds exactly one new card, including when another material is selected; **Shift+click** is an alternative for adding one card via mouse/keyboard. With a ring selected, any card click adds a new instance to that ring. To avoid replacing the card on the first click of a double-click, the single-click action waits briefly for a possible second click. Selection remains editable after insertion and the existing largest-free-gap placement logic remains in use.
+
+## Private demo login and AI interpreter
+
+The site is no longer publicly served as an unprotected static editor. The server exposes a **single demo username** (`bob`), with the password stored **only** in the `SPELLWEAVER_DEMO_PASSWORD` production GitHub Actions secret. Do not put this password or your OpenAI API key into source files, the browser bundle, or Git. The demo PIN is intentionally short; do not use this as an internet-facing multi-user authentication system. Use a long unique password if the project becomes publicly advertised.
+
+The backend issues HTTP-only, Secure, SameSite=Strict signed cookies, checks request origin on POST, throttles login attempts, limits AI calls to 15 per IP and 100 globally per rolling 24 hours (in-memory per server process), and caps request size and generated tokens. It does not claim canonical v37 spell behavior: AI output is a **provisional interpretation**, not a certified simulation, mana calculation or resolved spellbook entry. Responses are not retained by the app and API calls use `store: false`. The OpenAI API is billed separately from ChatGPT subscriptions.
+
+### Required production secrets
+
+Open the repository's **Settings → Secrets and variables → Actions → New repository secret** (or configure these as secrets in the production environment):
+
+- `SPELLWEAVER_DEMO_PASSWORD`: the demo password selected by the project owner; the username is `bob`.
+- `SPELLWEAVER_SESSION_SECRET`: at least 32 unpredictable characters, generated locally (for example `python3 -c 'import secrets;print(secrets.token_urlsafe(48))'`).
+- `OPENAI_API_KEY`: a project-scoped key from [OpenAI Platform](https://platform.openai.com/api-keys). Set project-level spend limits in Platform billing. The default model is `gpt-4.1-mini` (server-side only).
+
+**Deployment fails closed** if any of these secrets are missing, leaving the last healthy site running. The workflow transfers a `0600` private runtime file to `/opt/spellweaver/private/runtime.env` through pinned SSH and uses Docker's `--env-file`; only the SpellWeaver container is replaced. Caddy continues to proxy its existing host block. The key/password are not printed or written under the static release directory. No other containers are changed.
+
+To verify production, unauthenticated `/` should redirect to `/login`, unauthenticated `/app.js` should return 401, an authenticated session should access the editor, `/api/session` should report authentication and AI readiness, and a test interpretation should return a provisional result. The public `/version.json` reports the deployed commit for release verification.
