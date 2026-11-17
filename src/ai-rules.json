@@ -1,0 +1,242 @@
+{
+  "rulesVersion": "v37",
+  "rings": [
+    {
+      "name": "Smooth",
+      "effect": "Neutral"
+    },
+    {
+      "name": "Wavy",
+      "effect": "Oscillation"
+    },
+    {
+      "name": "Spiked",
+      "effect": "Piercing"
+    },
+    {
+      "name": "Toothed",
+      "effect": "Repeated slicing"
+    },
+    {
+      "name": "Dotted-node",
+      "effect": "Distributed emission"
+    },
+    {
+      "name": "Squared",
+      "effect": "Rigid barriers"
+    },
+    {
+      "name": "Double",
+      "effect": "Reinforcement"
+    },
+    {
+      "name": "Triple",
+      "effect": "Layered containment"
+    },
+    {
+      "name": "Star",
+      "effect": "Radiant projection"
+    },
+    {
+      "name": "Linked-circle",
+      "effect": "Chaining"
+    },
+    {
+      "name": "Tick-mark",
+      "effect": "Rhythmic release"
+    },
+    {
+      "name": "Lattice",
+      "effect": "Cross-binding"
+    },
+    {
+      "name": "Serpentine",
+      "effect": "Twisting motion"
+    },
+    {
+      "name": "Burst-mark",
+      "effect": "Burst release"
+    },
+    {
+      "name": "Inward-mark",
+      "effect": "Collection"
+    },
+    {
+      "name": "Braided",
+      "effect": "Flow fusion"
+    },
+    {
+      "name": "Chevron",
+      "effect": "Redirect"
+    },
+    {
+      "name": "Gate",
+      "effect": "Path selection"
+    },
+    {
+      "name": "Forked",
+      "effect": "Branch"
+    },
+    {
+      "name": "Anchor",
+      "effect": "Fix position"
+    },
+    {
+      "name": "Echo",
+      "effect": "Re-emit"
+    },
+    {
+      "name": "Sieve",
+      "effect": "Filter properties"
+    },
+    {
+      "name": "Inversion",
+      "effect": "Invert polarity"
+    },
+    {
+      "name": "Reservoir",
+      "effect": "Store output"
+    },
+    {
+      "name": "Synchronizer",
+      "effect": "Synchronize timing"
+    },
+    {
+      "name": "Prism",
+      "effect": "Separate constituents"
+    }
+  ],
+  "runes": [
+    {
+      "letter": "A",
+      "name": "Amplify"
+    },
+    {
+      "letter": "B",
+      "name": "Bind"
+    },
+    {
+      "letter": "C",
+      "name": "Cycle"
+    },
+    {
+      "letter": "D",
+      "name": "Delay"
+    },
+    {
+      "letter": "E",
+      "name": "Expand"
+    },
+    {
+      "letter": "F",
+      "name": "Focus"
+    },
+    {
+      "letter": "G",
+      "name": "Guard"
+    },
+    {
+      "letter": "H",
+      "name": "Hold"
+    },
+    {
+      "letter": "I",
+      "name": "Invert"
+    },
+    {
+      "letter": "J",
+      "name": "Join"
+    },
+    {
+      "letter": "K",
+      "name": "Kick"
+    },
+    {
+      "letter": "L",
+      "name": "Link"
+    },
+    {
+      "letter": "M",
+      "name": "Multiply"
+    },
+    {
+      "letter": "N",
+      "name": "Nullify"
+    },
+    {
+      "letter": "O",
+      "name": "Orbit"
+    },
+    {
+      "letter": "P",
+      "name": "Pierce"
+    },
+    {
+      "letter": "Q",
+      "name": "Quicken"
+    },
+    {
+      "letter": "R",
+      "name": "Redirect"
+    },
+    {
+      "letter": "S",
+      "name": "Split"
+    },
+    {
+      "letter": "T",
+      "name": "Twist"
+    },
+    {
+      "letter": "U",
+      "name": "Unfold"
+    },
+    {
+      "letter": "V",
+      "name": "Veil"
+    },
+    {
+      "letter": "W",
+      "name": "Weave"
+    },
+    {
+      "letter": "X",
+      "name": "Cross"
+    },
+    {
+      "letter": "Y",
+      "name": "Yield"
+    },
+    {
+      "letter": "Z",
+      "name": "Zone"
+    }
+  ],
+  "amps": {
+    "axes": [
+      45,
+      135,
+      225,
+      315
+    ],
+    "adjacentSameAxisForbidden": true,
+    "tiers": {
+      "Black": 1.2,
+      "Dark gray": 1.4,
+      "Light gray": 1.6,
+      "White": 1.8,
+      "Gold": 2
+    },
+    "stacking": "undefined"
+  },
+  "notes": [
+    "Every spell has one mandatory center element; default Void.",
+    "Inside rune = before that connected ring's elemental stage; outside rune = after.",
+    "Ring appearance modifies behavior; rune glyph provides secondary operation when correctly recognized and connected.",
+    "Repeated runes affect ink cost, but repetition strength is uncalibrated.",
+    "Mana is derived from unique final binary ink pixels; numerical conversion and casting discount formulas are uncalibrated.",
+    "Element scale increases intended effect output and cast duration, but no exact formula exists.",
+    "Card names do not grant abilities; only assembled ink can resolve.",
+    "Targeting, activation delays, material reactions, connections and 3D effects are not yet fully specified."
+  ]
+}
