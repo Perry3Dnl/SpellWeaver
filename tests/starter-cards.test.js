@@ -11,7 +11,7 @@ test('six experimental starter cards use valid existing element signatures',()=>
   assert.equal(card.source.cards.length,0);
   assert.ok(elements.some(e=>e.id===card.source.center.id));
   for(const ingredient of card.source.elements)assert.ok(elements.some(e=>e.id===ingredient.elementId));
-  assert.ok(card.description.toLowerCase().includes('not')||card.description.toLowerCase().includes('unverified'));
+  assert.match(card.description,/^Experimental/);
  }
 });
 test('embedded card JSON is self-contained and validates its placement',()=>{
