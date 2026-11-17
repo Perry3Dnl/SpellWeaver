@@ -30,7 +30,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for key in DEPLOY_HOST DEPLOY_USER DEPLOY_PASSWORD DEPLOY_HOST_KEY_FINGERPRINT OPENAI_API_KEY; do
+          for key in DEPLOY_HOST DEPLOY_USER DEPLOY_PASSWORD DEPLOY_HOST_KEY_FINGERPRINT; do
             test -n "${!key:-}" || { echo "Missing $key" >&2; exit 1; }
           done
           [[ "$DEPLOY_HOST" =~ ^[a-zA-Z0-9.-]+$ ]]
