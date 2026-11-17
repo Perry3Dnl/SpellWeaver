@@ -1,0 +1,47 @@
+name: Read-only shared proxy diagnosis
+on:
+  push:
+    branches: ['diagnose/shared-proxy-502']
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
+      DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '22' }}
+      DEPLOY_HOST_KEY_FINGERPRINT: ${{ vars.DEPLOY_HOST_KEY_FINGERPRINT || 'SHA256:Vq5Cic1/9iZsNAXfG9GQlnOjciecd6V9BPLGV5X2ExE' }}
+    steps:
+      - name: Connect to pinned server and inspect only
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq sshpass
+          mkdir -p "$RUNNER_TEMP/sw-diag"
+          printf '%s\n' "$DEPLOY_PASSWORD" > "$RUNNER_TEMP/sw-diag/password"
+          chmod 600 "$RUNNER_TEMP/sw-diag/password"
+          ssh-keyscan -T 15 -p "$DEPLOY_PORT" -t ed25519 "$DEPLOY_HOST" > "$RUNNER_TEMP/sw-diag/known_hosts" 2>/dev/null
+          test "$(ssh-keygen -lf "$RUNNER_TEMP/sw-diag/known_hosts" -E sha256 | awk 'NR==1 {print $2}')" = "$DEPLOY_HOST_KEY_FINGERPRINT"
+          sshpass -f "$RUNNER_TEMP/sw-diag/password" ssh -p "$DEPLOY_PORT" -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/sw-diag/known_hosts" "$DEPLOY_USER@$DEPLOY_HOST" "bash -s" <<'REMOTE'
+          set -euo pipefail
+          echo '=== Live container state (name/status/network only) ==='
+          docker ps -a --format '{{.Names}} | {{.Status}} | {{.Networks}}'
+          echo '=== Stock routing declaration ==='
+          grep -n -A10 -B2 'stocks.perry3d.nl' /opt/dummy-stock-simulator/deploy/Caddyfile | head -35 || true
+          echo '=== Caddy container readiness ==='
+          docker inspect --format '{{.Name}} status={{.State.Status}} running={{.State.Running}}' dummy-stock-caddy
+          echo '=== Stock container readiness ==='
+          docker ps -a --format '{{.Names}} {{.Status}}' | grep -Ei 'stock|caddy' || true
+          echo '=== Live sibling HTTP codes ==='
+          for url in https://stocks.perry3d.nl/ https://house.perry3d.nl/ https://perry3d.nl/health https://metelkaar.online/api/health https://spellweaver.perry3d.nl/version.json; do
+            code="$(curl -sS -L --max-time 12 -o /dev/null -w '%{http_code}' "$url" 2>/dev/null || true)"
+            echo "$url => $code"
+          done
+          REMOTE
+      - name: Cleanup SSH password
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/sw-diag"
