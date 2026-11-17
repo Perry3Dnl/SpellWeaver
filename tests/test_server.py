@@ -75,6 +75,20 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(self.request("/api/login",{"username":"bob","password":"test-only-pin"},origin=False)[0],403)
         for _ in range(5): self.assertEqual(self.request("/api/login",{"username":"bob","password":"wrong"})[0],401)
         self.assertEqual(self.request("/api/login",{"username":"bob","password":"wrong"})[0],429)
+    def test_session_key_is_generated_without_configuration(self):
+        source=(Path(__file__).resolve().parents[1] / "server.py").read_text()
+        workflow=(Path(__file__).resolve().parents[1] / ".github/workflows/deploy.yml").read_text()
+        self.assertIn('SESSION_SECRET = secrets.token_urlsafe(48)', source)
+        self.assertNotIn('SPELLWEAVER_SESSION_SECRET', source)
+        self.assertNotIn('SPELLWEAVER_SESSION_SECRET', workflow)
+        self.assertTrue(sw.config_ready())
+        previous=sw.PASSWORD
+        try:
+            sw.PASSWORD=""
+            self.assertFalse(sw.config_ready())
+        finally:
+            sw.PASSWORD=previous
+
     def test_session_tamper(self):
         sw.SESSION_SECRET = "stable-secret-for-unit-tests-32-char-xyz"
         tok=sw.token()
