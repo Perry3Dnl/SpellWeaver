@@ -16,7 +16,7 @@ Canonical machine-readable stroke definitions for Mana, Void, Light, Darkness, H
 
 ## Run and test
 
-Node.js 22 recommended (no external npm dependencies). Run `npm run check` for tests and the build. The checked-in static files remain build artifacts, but the private demo now requires the Python server: set `SPELLWEAVER_DEMO_PASSWORD` and `OPENAI_API_KEY` in your environment, then run `SPELLWEAVER_SITE=dist SPELLWEAVER_HOST=127.0.0.1 SPELLWEAVER_ORIGIN=http://localhost:8080 python3 dist/server.py`. The production cookie is Secure, so login requires HTTPS in production; use HTTPS for integration testing. `npm run check` runs all source, backend and deployment checks.
+Node.js 22 recommended (no external npm dependencies). Run `npm run check` for tests and the build. The checked-in static files remain build artifacts, but the private demo now requires the Python server: set `OPENAI_API_KEY` if AI interpretation is needed in your environment, then run `SPELLWEAVER_SITE=dist SPELLWEAVER_HOST=127.0.0.1 SPELLWEAVER_ORIGIN=http://localhost:8080 python3 dist/server.py`. The production cookie is Secure, so login requires HTTPS in production; use HTTPS for integration testing. `npm run check` runs all source, backend and deployment checks.
 
 ## Deployment / Caddy safety
 
@@ -56,19 +56,20 @@ For both **Materials** and **Cards**, a single click edits/replaces the currentl
 
 ## Private demo login and AI interpreter
 
-The site is no longer publicly served as an unprotected static editor. The server exposes a **single demo username** (`bob`), with the password stored **only** in the `SPELLWEAVER_DEMO_PASSWORD` production GitHub Actions secret. Do not put this password or your OpenAI API key into source files, the browser bundle, or Git. The demo PIN is intentionally short; do not use this as an internet-facing multi-user authentication system. Use a long unique password if the project becomes publicly advertised.
+The site is no longer publicly served as an unprotected static editor. The server exposes a **single demo username** (`bob`), with the requested fixed demo password. It is a basic shared gate, not robust account security. Do not put this password or your OpenAI API key into source files, the browser bundle, or Git. The demo PIN is intentionally short; do not use this as an internet-facing multi-user authentication system. Use a long unique password if the project becomes publicly advertised.
 
 The backend issues HTTP-only, Secure, SameSite=Strict signed cookies using a random signing key generated automatically at server startup (sessions expire on restart), checks request origin on POST, throttles login attempts, limits AI calls to 15 per IP and 100 globally per rolling 24 hours (in-memory per server process), and caps request size and generated tokens. It does not claim canonical v37 spell behavior: AI output is a **provisional interpretation**, not a certified simulation, mana calculation or resolved spellbook entry. Responses are not retained by the app and API calls use `store: false`. The OpenAI API is billed separately from ChatGPT subscriptions.
 
-### Required production secrets (no server shell access required)
+### Optional API key (no server shell access required)
 
 Open the repository's **Settings → Secrets and variables → Actions → New repository secret** (or configure these as secrets in the production environment):
 
-- `SPELLWEAVER_DEMO_PASSWORD`: the demo password selected by the project owner; the username is `bob`.
 - `OPENAI_API_KEY`: a project-scoped key from [OpenAI Platform](https://platform.openai.com/api-keys). Set project-level spend limits in Platform billing. The default model is `gpt-4.1-mini` (server-side only).
 
-**Deployment fails closed** if either secret is missing, leaving the last healthy site running. The workflow transfers a `0600` private runtime file to `/opt/spellweaver/private/runtime.env` through pinned SSH and uses Docker's `--env-file`; only the SpellWeaver container is replaced. Caddy continues to proxy its existing host block. The key/password are not printed or written under the static release directory. No other containers are changed.
+**AI requests remain unavailable** if the optional OpenAI key is missing, leaving the last healthy site running. The workflow transfers a `0600` private runtime file to `/opt/spellweaver/private/runtime.env` through pinned SSH and uses Docker's `--env-file`; only the SpellWeaver container is replaced. Caddy continues to proxy its existing host block. The key/password are not printed or written under the static release directory. No other containers are changed.
 
 To verify production, unauthenticated `/` should redirect to `/login`, unauthenticated `/app.js` should return 401, an authenticated session should access the editor, `/api/session` should report authentication and AI readiness, and a test interpretation should return a provisional result. The public `/version.json` reports the deployed commit for release verification.
 
 No manually provisioned session secret is required: the backend generates one at startup. Logging in again after a deployment or container restart is expected. All setup is done in GitHub Actions secrets; no SSH or server commands are required from the project owner.
+
+The login uses exactly the requested username and password, without user-provisioned session credentials. Only the optional OpenAI API key is configured through GitHub Actions. No server shell access is required.
