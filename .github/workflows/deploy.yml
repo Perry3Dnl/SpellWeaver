@@ -18,7 +18,7 @@ jobs:
       DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
       DEPLOY_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
       DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '22' }}
-      DEPLOY_HOST_KEY_FINGERPRINT: ${{ vars.DEPLOY_HOST_KEY_FINGERPRINT }}
+      DEPLOY_HOST_KEY_FINGERPRINT: ${{ vars.DEPLOY_HOST_KEY_FINGERPRINT || 'SHA256:Vq5Cic1/9iZsNAXfG9GQlnOjciecd6V9BPLGV5X2ExE' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -51,24 +51,13 @@ jobs:
           SSH_OPTS=(-o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/sw-ssh/known_hosts" -o PubkeyAuthentication=no -o PreferredAuthentications=password,keyboard-interactive -p "$DEPLOY_PORT")
           remote="$DEPLOY_USER@$DEPLOY_HOST"
           tar -czf "$RUNNER_TEMP/spellweaver.tar.gz" -C dist .
-          sshpass -f "$RUNNER_TEMP/sw-ssh/password" ssh "${SSH_OPTS[@]}" "$remote" "mkdir -p /opt/spellweaver/releases/$GITHUB_SHA"
-          sshpass -f "$RUNNER_TEMP/sw-ssh/password" scp -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/sw-ssh/known_hosts" -o PubkeyAuthentication=no -o PreferredAuthentications=password,keyboard-interactive -P "$DEPLOY_PORT" "$RUNNER_TEMP/spellweaver.tar.gz" "$remote:/opt/spellweaver/releases/$GITHUB_SHA/release.tar.gz"
-          sshpass -f "$RUNNER_TEMP/sw-ssh/password" ssh "${SSH_OPTS[@]}" "$remote" "bash -s -- '$GITHUB_SHA'" <<'REMOTE'
-          set -euo pipefail
-          revision="$1"
-          app_dir=/opt/spellweaver
-          tar -xzf "$app_dir/releases/$revision/release.tar.gz" -C "$app_dir/releases/$revision"
-          rm -f "$app_dir/releases/$revision/release.tar.gz"
-          # Only this application path is modified; never replace the shared Caddyfile.
-          if [ ! -e "$app_dir/current" ];then ln -s "$app_dir/releases/$revision" "$app_dir/current";else ln -sfn "$app_dir/releases/$revision" "$app_dir/.current-next";mv -Tf "$app_dir/.current-next" "$app_dir/current";fi
-          if systemctl list-unit-files spellweaver.service --no-legend 2>/dev/null | grep -q '^spellweaver.service';then
-            sudo systemctl restart spellweaver.service
-          else
-            echo 'Dedicated spellweaver.service not installed; refusing to change Caddy or unrelated services.' >&2
-            exit 1
-          fi
-          curl --fail --silent --show-error --max-time 15 http://127.0.0.1:18087/version.json
-          REMOTE
+          # This transfer touches only /opt/spellweaver. It never overwrites the shared Caddyfile.
+          sshpass -f "$RUNNER_TEMP/sw-ssh/password" ssh "${SSH_OPTS[@]}" "$remote" "mkdir -p /opt/spellweaver/deploy"
+          sshpass -f "$RUNNER_TEMP/sw-ssh/password" scp -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/sw-ssh/known_hosts" -o PubkeyAuthentication=no -o PreferredAuthentications=password,keyboard-interactive -P "$DEPLOY_PORT" \
+            "$RUNNER_TEMP/spellweaver.tar.gz" "$remote:/opt/spellweaver/.release-$GITHUB_SHA.tar.gz"
+          sshpass -f "$RUNNER_TEMP/sw-ssh/password" scp -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/sw-ssh/known_hosts" -o PubkeyAuthentication=no -o PreferredAuthentications=password,keyboard-interactive -P "$DEPLOY_PORT" \
+            deploy/remote-deploy.sh deploy/caddy-update.py "$remote:/opt/spellweaver/deploy/"
+          sshpass -f "$RUNNER_TEMP/sw-ssh/password" ssh "${SSH_OPTS[@]}" "$remote" "bash /opt/spellweaver/deploy/remote-deploy.sh '$GITHUB_SHA'"
       - name: Verify domain serves exact deployed revision
         shell: bash
         run: |

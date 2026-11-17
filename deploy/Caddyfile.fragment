@@ -1,8 +1,9 @@
-# SpellWeaver managed route: copy this site block into the existing shared Caddyfile.
-# DO NOT replace any other site blocks or start a second Caddy listener on ports 80/443.
+# This is the isolated SpellWeaver site block that the deployment script
+# appends inside its own markers. The complete existing Caddyfile is preserved.
+# Do not replace the server Caddyfile with this fragment.
 spellweaver.perry3d.nl {
     encode zstd gzip
     header X-Content-Type-Options nosniff
-    header Referrer-Policy strict-origin-when-cross-origin
-    reverse_proxy 127.0.0.1:18087
+    header Referrer-Policy "strict-origin-when-cross-origin"
+    reverse_proxy spellweaver-web:8080
 }

@@ -20,17 +20,13 @@ Node.js 22 recommended (no external npm dependencies). Run `npm run check` for t
 
 ## Deployment / Caddy safety
 
-The GitHub Actions deploy workflow deploys **only** to `/opt/spellweaver/releases/<commit>` and atomically updates `/opt/spellweaver/current`. It does **not** modify `/etc/caddy/Caddyfile`, perform `docker compose down`, delete other application directories, or bind 80/443. It expects an already provisioned `spellweaver.service` listening on **127.0.0.1:18087**, and a shared Caddy route forwarding `spellweaver.perry3d.nl` to that local listener.
+This repository follows the server's **existing** Docker/Caddy arrangement discovered in the Perry3Dnl/MetElkaarOnline project. Production is `https://spellweaver.perry3d.nl`; it shares the existing `dummy-stock-caddy` reverse proxy and `dummy-stock-simulator_default` network, without running another proxy on ports 80/443.
 
-**One-time server provisioning (review current proxy first):**
+GitHub Actions checks the source, builds static `dist/`, authenticates over SSH with the configured host/user/password and an **ED25519 host-key fingerprint**, and uploads the exact commit as an isolated release under `/opt/spellweaver/releases/<sha>`. Deployment creates a dedicated static container with the `spellweaver-web` network alias. It modifies **only the dedicated SpellWeaver marker block** in `/opt/dummy-stock-simulator/deploy/Caddyfile`, preserves a timestamped backup, validates the combined Caddy configuration inside the running proxy, and reloads the existing proxy without recreating it. Other containers, storage, databases, and site blocks remain untouched. See `deploy/README.md`.
 
-1. Inspect `sudo systemctl status caddy`, `sudo cat /etc/caddy/Caddyfile`, `sudo ss -lntp` and the current shared reverse-proxy method. Verify 18087 is available. Do not disturb existing domains.
-2. Install `deploy/spellweaver.service` under `/etc/systemd/system/spellweaver.service`, run `sudo systemctl daemon-reload` and `sudo systemctl enable --now spellweaver.service` *after* the first static release exists. The deploy workflow intentionally refuses to install system units with broad sudo.
-3. **Only when appropriate for the actual shared proxy**, append the standalone host block from `deploy/Caddyfile.fragment` to the existing shared Caddyfile (or add it through the proxy's established include mechanism). Back up the original first, run `caddy validate --config /etc/caddy/Caddyfile` and reload Caddy; never replace the whole file or start a second proxy.
-4. Add GitHub secrets `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_PASSWORD`, optionally `DEPLOY_PORT`, and repository variable `DEPLOY_HOST_KEY_FINGERPRINT` (the verified server ED25519 SHA256 fingerprint). Trigger push-to-main deployment.
-5. Check `https://spellweaver.perry3d.nl/version.json` reports the exact deployed commit, then check the editor and existing domains. If the main Caddy process runs in Docker and cannot access host loopback, adapt only the dedicated host block to an appropriate reachable address after inspecting the shared network; do not assume `127.0.0.1` in a container reaches the host.
+This initial production setup requires the deploy account to be able to create `/opt/spellweaver`, access Docker and edit the existing Caddyfile. If host permissions, fingerprint, or layout differ, deployment fails closed; do not relax security to force a pass. The repo's `DEPLOY_HOST_KEY_FINGERPRINT` variable may override the pinned identity used in the other production repo. Secret names: `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_PASSWORD`, and optional `DEPLOY_PORT`.
 
-The shared server proxy and unit locations have **not** been directly inspected from this environment; the workflow deliberately fails safe rather than changing a live Caddy configuration without that inspection.
+Successful deployment must be verified at `https://spellweaver.perry3d.nl/version.json` by matching its `revision` to the GitHub commit, and by testing the page and previously running services. A completed GitHub Actions job without a matching live version is not considered release completion.
 
 ## Versioned configuration
 

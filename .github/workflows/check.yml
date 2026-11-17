@@ -16,4 +16,4 @@ jobs:
           node-version: '22'
       - run: npm run check
       - name: Check deploy scripts
-        run: bash -n deploy/install.sh
+        run: bash -n deploy/install.sh deploy/remote-deploy.sh
