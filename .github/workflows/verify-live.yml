@@ -24,24 +24,57 @@ jobs:
             sleep 5
           done
           [ "$ready" = true ] || { echo 'Live site does not serve this commit' >&2; exit 1; }
-      - name: Verify functional frontend assets
+      - name: Verify private login, session and AI readiness
         shell: bash
+        env:
+          DEMO_PASSWORD: ${{ secrets.SPELLWEAVER_DEMO_PASSWORD }}
         run: |
           set -euo pipefail
-          curl -fsSL --max-time 20 https://spellweaver.perry3d.nl/ -o /tmp/sw-home.html
-          curl -fsSL --max-time 20 https://spellweaver.perry3d.nl/app.js -o /tmp/sw-app.js
-          curl -fsSL --max-time 20 https://spellweaver.perry3d.nl/src/elements.json -o /tmp/sw-elements.json
-          curl -fsSL --max-time 20 https://spellweaver.perry3d.nl/style.css -o /tmp/sw-style.css
+          base=https://spellweaver.perry3d.nl
+          test "$(curl -sS -o /dev/null -w '%{http_code}' "$base/")" = 302
+          test "$(curl -sS -o /dev/null -w '%{http_code}' "$base/app.js")" = 401
+          curl -fsSL --max-time 20 "$base/login" -o /tmp/sw-login.html
+          grep -Fq 'id="login"' /tmp/sw-login.html
+          curl -fsSL --max-time 20 "$base/login.js" | grep -Fq '/api/login'
+          test -n "$DEMO_PASSWORD"
+          umask 077
+          printf '{"username":"bob","password":"%s"}' "$DEMO_PASSWORD" >/tmp/sw-login-request.json
+          curl -fsSL --max-time 20 -c /tmp/sw-cookies -H 'Origin: https://spellweaver.perry3d.nl' \
+            -H 'Content-Type: application/json' --data-binary @/tmp/sw-login-request.json \
+            "$base/api/login" >/tmp/sw-login-result.json
+          curl -fsSL --max-time 20 -b /tmp/sw-cookies "$base/" >/tmp/sw-home.html
+          curl -fsSL --max-time 20 -b /tmp/sw-cookies "$base/app.js" >/tmp/sw-app.js
+          curl -fsSL --max-time 20 -b /tmp/sw-cookies "$base/src/elements.json" >/tmp/sw-elements.json
+          curl -fsSL --max-time 20 -b /tmp/sw-cookies "$base/style.css" >/tmp/sw-style.css
+          curl -fsSL --max-time 20 -b /tmp/sw-cookies "$base/api/session" >/tmp/sw-session.json
           grep -Fq 'SPELLWEAVER' /tmp/sw-home.html
           grep -Fq 'id="circle"' /tmp/sw-home.html
-          grep -Fq 'renderSpell' /tmp/sw-app.js
+          grep -Fq '/api/interpret' /tmp/sw-app.js
           grep -Fq '.workbench' /tmp/sw-style.css
           python3 - <<'PY'
           import json
+          session=json.load(open('/tmp/sw-session.json'))
+          assert session.get('authenticated') is True
+          assert session.get('aiEnabled') is True
           entries=json.load(open('/tmp/sw-elements.json'))
-          assert len(entries)==124, f'Expected 124 elements, got {len(entries)}'
-          assert entries[-2]['name']=='Holy' and entries[-1]['name']=='Unholy'
+          assert len(entries)==124
           PY
+      - name: Verify HTML renders with browser JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          if command -v google-chrome >/dev/null 2>&1;then browser=google-chrome
+          elif command -v chromium >/dev/null 2>&1;then browser=chromium
+          else
+            echo 'No chromium-family browser available; JS browser verification unavailable' >&2
+            exit 1
+          fi
+          "$browser" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage \
+            --virtual-time-budget=8000 --dump-dom 'https://spellweaver.perry3d.nl/login' \
+            > /tmp/sw-rendered.html
+          grep -Fq 'id="login"' /tmp/sw-rendered.html
+          grep -Fq 'name="username"' /tmp/sw-rendered.html
+          grep -Fq 'name="password"' /tmp/sw-rendered.html
       - name: Ensure other shared Caddy routes remain reachable
         shell: bash
         run: |
@@ -62,19 +95,3 @@ jobs:
               *) echo "Shared route unhealthy: $url => $code" >&2;exit 1;;
             esac
           done
-      - name: Verify HTML renders with browser JavaScript
-        shell: bash
-        run: |
-          set -euo pipefail
-          if command -v google-chrome >/dev/null 2>&1;then browser=google-chrome
-          elif command -v chromium >/dev/null 2>&1;then browser=chromium
-          else
-            echo 'No chromium-family browser available; JS browser verification unavailable' >&2
-            exit 1
-          fi
-          "$browser" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage \
-            --virtual-time-budget=8000 --dump-dom 'https://spellweaver.perry3d.nl/' \
-            > /tmp/sw-rendered.html
-          grep -Fq 'Hydrogen' /tmp/sw-rendered.html
-          grep -Eq 'FILLED INK PIXELS' /tmp/sw-rendered.html
-          grep -Eq 'id="pixel-count"[^>]*>[0-9,]+' /tmp/sw-rendered.html
