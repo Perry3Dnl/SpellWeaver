@@ -31,3 +31,9 @@ Successful deployment must be verified at `https://spellweaver.perry3d.nl/versio
 ## Versioned configuration
 
 `spellweaver.creation.v1` JSON stores center, rings, placed elements, runes, Amps, hand-drawn strokes, and cast duration. `spellweaver.ink-card.v1` stores 500 × 500 filled pixel indices (black/transparent). These are documented prototype schemas, not the final game protocol.
+
+## Experimental elemental starter cards
+
+The new **Cards** tab contains Fire, Water, Ice, Lava, Steam and Wind compositions built from existing atomic element drawings, rings and runes. Click a card to place a copy of its ink on the outermost ring; click the placed card to select it, drag it, replace its template, or adjust ring, scale and rotation. Each placed card stores the entire template source in exported spell JSON, so importing the same design does not depend on a local catalogue. The composite ink is rendered and recorded with the rest of the inscription.
+
+**No recipes are canonical yet.** The game design explicitly leaves chemical reactions, recognition thresholds and casting outcomes undefined. Names and ingredient lists are educational starting points, not awarded spells or guaranteed effects. No magical effect is derived from the card name, and no extra mana charge is assigned to card placement. These remain prototype ink constructions, not castable entries.
