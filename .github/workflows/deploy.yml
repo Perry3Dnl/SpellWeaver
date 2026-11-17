@@ -15,7 +15,6 @@ jobs:
     environment: production
     env:
       SPELLWEAVER_DEMO_PASSWORD: ${{ secrets.SPELLWEAVER_DEMO_PASSWORD }}
-      SPELLWEAVER_SESSION_SECRET: ${{ secrets.SPELLWEAVER_SESSION_SECRET }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
       DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
@@ -32,13 +31,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for key in DEPLOY_HOST DEPLOY_USER DEPLOY_PASSWORD DEPLOY_HOST_KEY_FINGERPRINT SPELLWEAVER_DEMO_PASSWORD SPELLWEAVER_SESSION_SECRET OPENAI_API_KEY; do
+          for key in DEPLOY_HOST DEPLOY_USER DEPLOY_PASSWORD DEPLOY_HOST_KEY_FINGERPRINT SPELLWEAVER_DEMO_PASSWORD OPENAI_API_KEY; do
             test -n "${!key:-}" || { echo "Missing $key" >&2; exit 1; }
           done
           [[ "$DEPLOY_HOST" =~ ^[a-zA-Z0-9.-]+$ ]]
           [[ "$DEPLOY_USER" =~ ^[a-zA-Z_][a-zA-Z0-9_.-]*$ ]]
           [[ "$DEPLOY_PORT" =~ ^[0-9]+$ ]]
-          test "${#SPELLWEAVER_SESSION_SECRET}" -ge 32 || { echo 'Session key too short' >&2; exit 1; }
       - name: Upload isolated release with pinned SSH identity
         shell: bash
         run: |
@@ -56,8 +54,8 @@ jobs:
           remote="$DEPLOY_USER@$DEPLOY_HOST"
           umask 077
           # Config is only on the runner and private host directory; never bundled in dist.
-          printf 'SPELLWEAVER_DEMO_USERNAME=bob\nSPELLWEAVER_DEMO_PASSWORD=%s\nSPELLWEAVER_SESSION_SECRET=%s\nOPENAI_API_KEY=%s\n' \
-            "$SPELLWEAVER_DEMO_PASSWORD" "$SPELLWEAVER_SESSION_SECRET" "$OPENAI_API_KEY" > "$RUNNER_TEMP/sw-ssh/runtime.env"
+          printf 'SPELLWEAVER_DEMO_USERNAME=bob\nSPELLWEAVER_DEMO_PASSWORD=%s\nOPENAI_API_KEY=%s\n' \
+            "$SPELLWEAVER_DEMO_PASSWORD" "$OPENAI_API_KEY" > "$RUNNER_TEMP/sw-ssh/runtime.env"
           tar -czf "$RUNNER_TEMP/spellweaver.tar.gz" -C dist .
           # This transfer touches only /opt/spellweaver. It never overwrites the shared Caddyfile.
           sshpass -f "$RUNNER_TEMP/sw-ssh/password" ssh "${SSH_OPTS[@]}" "$remote" "mkdir -p /opt/spellweaver/deploy /opt/spellweaver/private && chmod 700 /opt/spellweaver/private"
