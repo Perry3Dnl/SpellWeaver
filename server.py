@@ -82,6 +82,9 @@ def interpret(spell):
                                     "name": (x.get("template") or {}).get("name"),
                                     "source": (x.get("template") or {}).get("source")}}
                       for x in spell["cards"] if isinstance(x, dict)]
+    catalog = json.loads((ROOT / "src/elements.json").read_text(encoding="utf-8"))
+    names = {str(element["id"]): element["name"] for element in catalog}
+    clean["elementNames"] = names
     data = json.dumps(clean, separators=(",", ":"))
     if len(data.encode()) > 40000:
         raise ValueError("Spell is too large for demo interpretation")
@@ -97,6 +100,8 @@ def interpret(spell):
         "Reply in plain English using short headings: Interpretation, Sequence, Components, "
         "Uncertainties. Maximum 320 words."
     )
+    rules = json.loads((ROOT / "src/ai-rules.json").read_text(encoding="utf-8"))
+    prompt += "\\nEstablished v37 component names and provisional rules: " + json.dumps(rules, separators=(",", ":"))
     req = urllib.request.Request(
         "https://api.openai.com/v1/responses",
         data=json.dumps({"model": MODEL, "instructions": prompt, "input": data,
