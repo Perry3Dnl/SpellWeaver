@@ -4,7 +4,9 @@ import {polar,renderSpell,measureInk} from './src/geometry.js';
 import {STARTER_CARDS} from './src/starter-cards.js';
 import {MATERIAL_CARDS} from './src/material-cards.js';
 import {nextPlacementAngle} from './src/placement.js';
+import {createCardClickController} from './src/card-clicks.js';
 let spell=initialSpell(),tab='elements',search='',selected=null,tool='select',history=[],future=[],drawing=null;let nextId=1,placementRingId=null;
+const cardClicks=createCardClickController(v=>addComponent(v),v=>addComponent(v,true));
 const $=id=>document.getElementById(id),canvas=$('circle'),ctx=canvas.getContext('2d');
 const id=()=>nextId++;
 function toast(s){$('toast').textContent=s;$('toast').classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').classList.remove('show'),3500)}
@@ -63,16 +65,16 @@ function catalogue(){
   symbol.style.fontSize=tab==='elements'&&!v.special?'12px':'25px';
   const name=document.createElement('span');name.className='itemname';name.textContent=v.name;
   const meta=document.createElement('span');meta.className='itemmeta';meta.textContent=tab==='elements'?`${v.id} · ${v.symbol}`:tab==='runes'?`${v.letter} · rune`:tab==='rings'?v.effect:(tab==='cards'||tab==='materials')?(tab==='materials'?v.category:v.ingredients.join(' + ')):`×${v.multiplier.toFixed(1)} · ${v.name}`;
-  b.append(symbol,name,meta);b.onclick=()=>addComponent(v);el.append(b);
+  b.append(symbol,name,meta);if(tab==='cards'||tab==='materials'){b.onclick=e=>cardClicks.click(v,e);b.ondblclick=e=>{e.preventDefault();cardClicks.doubleClick(v)}}else b.onclick=()=>{cardClicks.cancel();addComponent(v)};el.append(b);
  }
  if(!el.children.length)el.textContent='No matching components.';
  const active=el.querySelector('.catalogue-selected');if(active)active.scrollIntoView({block:'nearest',inline:'nearest'});
 }
 
-function addComponent(v){
+function addComponent(v,forceAdd=false){
  if(tab==='cards'||tab==='materials'){
   const current=object();
-  if(!placementRing() && selected?.type==='card' && current){
+  if(!forceAdd && !placementRing() && selected?.type==='card' && current){
    if(current.template.id!==v.id){commit();current.template=structuredClone(v);toast(`Card replaced with ${v.name}`)}
   }else{
    const ringId=hostRingId();
@@ -154,7 +156,7 @@ $('undo').onclick=()=>{if(!history.length)return;future.push(structuredClone(spe
 $('new-btn').onclick=()=>{if(!confirm('Start a new inscription? Export your current design first if needed.'))return;commit();spell=initialSpell();selected=null;placementRingId=null;update();toast('New inscription created')};$('import-btn').onclick=()=>$('import-file').click();$('import-file').onchange=async e=>{try{const file=e.target.files[0];if(!file)return;if(file.size>3000000)throw Error('File too large');const imported=normalizeImport(JSON.parse(await file.text()),elements);const problems=validateSpell(imported);if(problems.length)throw Error(problems.join('; '));commit();spell=imported;placementRingId=null;nextId=Math.max(1,...[...spell.elements,...spell.runes,...spell.amps,...spell.cards,...spell.strokes].map(x=>x.id||0))+1;selected=null;update();toast('Spell imported')}catch(err){toast('Import rejected: '+err.message)}finally{e.target.value=''}};
 $('save-spell').onclick=()=>{if(issueList().length){toast('Fix structural warnings before saving');return}const snapshot={kind:'spellweaver.personal-spellbook-prototype',source:structuredClone(spell),finalizedAt:new Date().toISOString(),resolvedBehavior:null,calibratedManaCost:null,castSeconds:spell.castSeconds,note:'An immutable design snapshot, NOT an executable validated castable spell.'};download('spellweaver-snapshot.json',JSON.stringify(snapshot,null,2));toast('Immutable design snapshot downloaded; rule interpreter not yet implemented')};
 $('record-card').onclick=()=>{const c=document.createElement('canvas');c.width=c.height=500;const g=c.getContext('2d');g.strokeStyle='#000';setView(g,Math.min(1,230/(Math.max(0,...spell.rings.map(r=>r.radius))+42)));renderSpell(g,spell,elements,{guides:false});g.resetTransform();const binary=g.getImageData(0,0,500,500).data;const packed=[];for(let i=3;i<binary.length;i+=4)if(binary[i]>127)packed.push((i-3)/4);download('spellweaver-ink-card.json',JSON.stringify({schema:'spellweaver.ink-card.v1',width:500,height:500,filledPixels:packed,name:spell.name,sourceRulesVersion:'v37'},null,0));toast('500 × 500 binary ink card recorded')};
-for(const button of $('tabs').querySelectorAll('button'))button.onclick=()=>{tab=button.dataset.tab;search='';$('search').value='';for(const x of $('tabs').querySelectorAll('button'))x.classList.toggle('active',x===button);catalogue()};$('search').oninput=e=>{search=e.target.value;catalogue()};
+for(const button of $('tabs').querySelectorAll('button'))button.onclick=()=>{cardClicks.cancel();tab=button.dataset.tab;search='';$('search').value='';for(const x of $('tabs').querySelectorAll('button'))x.classList.toggle('active',x===button);catalogue()};$('search').oninput=e=>{cardClicks.cancel();search=e.target.value;catalogue()};
 // Dedicated origin selector: exactly one element, with visible Void fallback.
 canvas.addEventListener('dblclick',e=>{const p=toPoint(e);if(Math.hypot(p[0]-250,p[1]-250)<35){selected={type:'center'};placementRingId=null;focusCatalogueOnSelection();update()}});
 selected={type:'center'};catalogue();update();
