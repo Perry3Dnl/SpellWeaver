@@ -56,7 +56,7 @@ jobs:
           remote="$DEPLOY_USER@$DEPLOY_HOST"
           umask 077
           # Config is only on the runner and private host directory; never bundled in dist.
-          printf 'SPELLWEAVER_DEMO_USERNAME=bob\\nSPELLWEAVER_DEMO_PASSWORD=%s\\nSPELLWEAVER_SESSION_SECRET=%s\\nOPENAI_API_KEY=%s\\n' \
+          printf 'SPELLWEAVER_DEMO_USERNAME=bob\nSPELLWEAVER_DEMO_PASSWORD=%s\nSPELLWEAVER_SESSION_SECRET=%s\nOPENAI_API_KEY=%s\n' \
             "$SPELLWEAVER_DEMO_PASSWORD" "$SPELLWEAVER_SESSION_SECRET" "$OPENAI_API_KEY" > "$RUNNER_TEMP/sw-ssh/runtime.env"
           tar -czf "$RUNNER_TEMP/spellweaver.tar.gz" -C dist .
           # This transfer touches only /opt/spellweaver. It never overwrites the shared Caddyfile.
