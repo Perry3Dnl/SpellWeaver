@@ -50,9 +50,9 @@ class ServerTests(unittest.TestCase):
         except urllib.error.HTTPError as ex:
             return ex.code, dict(ex.headers), ex.read()
     def test_locked_without_session(self):
-        for path in ["/", "/index.html", "/app.js", "/src/elements.json"]:
+        for path in ["/app.js", "/src/elements.json"]:
             self.assertEqual(self.request(path)[0],401)
-        self.assertEqual(self.request("/login")[0],200)
+        self.assertEqual(self.request("/")[0],200)\n        self.assertEqual(self.request("/index.html")[0],200)\n        self.assertEqual(self.request("/login")[0],200)
         self.assertEqual(self.request("/login.js")[0],200)
         self.assertEqual(self.request("/login.css")[0],200)
         self.assertEqual(self.request("/version.json")[0],200)
@@ -68,7 +68,7 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(self.request("/index.html",cookie=cookie)[0],200)
         self.assertEqual(self.request("/api/interpret",{"spell":{}},cookie=cookie)[0],503)
         self.assertEqual(self.request("/api/logout",{},cookie=cookie)[0],200)
-        self.assertEqual(self.request("/",origin=False)[0],401)
+        self.assertEqual(self.request("/app.js",origin=False)[0],401)
     def test_csrf_and_login_throttling(self):
         self.assertEqual(self.request("/api/login",{"username":"bob","password":"test-only-pin"},origin=False)[0],403)
         for _ in range(5): self.assertEqual(self.request("/api/login",{"username":"bob","password":"wrong"})[0],401)
