@@ -24,24 +24,50 @@ jobs:
             sleep 5
           done
           [ "$ready" = true ] || { echo 'Live site does not serve this commit' >&2; exit 1; }
-      - name: Verify private login, session and AI readiness
+      - name: Verify public login, protected assets, and authenticated editor
         shell: bash
         run: |
           set -euo pipefail
           base=https://spellweaver.perry3d.nl
-          test "$(curl -sS -o /dev/null -w '%{http_code}' "$base/")" = 302
-          test "$(curl -sS -o /dev/null -w '%{http_code}' "$base/app.js")" = 401
+          root_status="$(curl -sS --max-time 20 -o /tmp/sw-root-response -w '%{http_code}' "$base/")"
+          asset_status="$(curl -sS --max-time 20 -o /tmp/sw-asset-response -w '%{http_code}' "$base/app.js")"
+          echo "Unauthenticated homepage: HTTP $root_status; private JS: HTTP $asset_status"
+          test "$root_status" = 302
+          test "$asset_status" = 401
           curl -fsSL --max-time 20 "$base/login" -o /tmp/sw-login.html
           grep -Fq 'id="login"' /tmp/sw-login.html
-          curl -fsSL --max-time 20 "$base/login.js" | grep -Fq '/api/login'
-          # Public login is checked without putting the shared demo credential in CI logs.
-          curl -fsSL --max-time 20 "$base/api/session" >/tmp/sw-session-public.json
+          curl -fsSL --max-time 20 "$base/login.js" -o /tmp/sw-login.js
+          grep -Fq '/api/login' /tmp/sw-login.js
+          curl -fsSL --max-time 20 "$base/login.css" -o /tmp/sw-login.css
+          curl -fsSL --max-time 20 "$base/api/session" -o /tmp/sw-session-public.json
           python3 - <<'PY'
           import json
           session=json.load(open('/tmp/sw-session-public.json'))
           assert session.get('authenticated') is False
           assert isinstance(session.get('aiEnabled'), bool)
           PY
+          umask 077
+          python3 - <<'PY'
+          import json
+          with open('/tmp/sw-login.json','w') as f:
+              json.dump({'username':'bob','password':'1223'},f)
+          PY
+          curl -fsSL --max-time 20 -c /tmp/sw-cookiejar \
+            -H 'Origin: https://spellweaver.perry3d.nl' -H 'Content-Type: application/json' \
+            --data-binary @/tmp/sw-login.json "$base/api/login" -o /tmp/sw-login-ok.json
+          curl -fsSL --max-time 20 -b /tmp/sw-cookiejar "$base/" -o /tmp/sw-home.html
+          curl -fsSL --max-time 20 -b /tmp/sw-cookiejar "$base/app.js" -o /tmp/sw-app.js
+          curl -fsSL --max-time 20 -b /tmp/sw-cookiejar "$base/src/elements.json" -o /tmp/sw-elements.json
+          curl -fsSL --max-time 20 -b /tmp/sw-cookiejar "$base/api/session" -o /tmp/sw-session-auth.json
+          grep -Fq 'SPELLWEAVER' /tmp/sw-home.html
+          grep -Fq 'id="circle"' /tmp/sw-home.html
+          grep -Fq '/api/interpret' /tmp/sw-app.js
+          python3 - <<'PY'
+          import json
+          assert json.load(open('/tmp/sw-session-auth.json'))['authenticated'] is True
+          assert len(json.load(open('/tmp/sw-elements.json'))) == 124
+          PY
+          rm -f /tmp/sw-login.json /tmp/sw-cookiejar
       - name: Verify HTML renders with browser JavaScript
         shell: bash
         run: |
