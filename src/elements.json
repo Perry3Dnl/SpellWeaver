@@ -1,0 +1,870 @@
+[
+  {
+    "id": 1,
+    "symbol": "H",
+    "name": "Hydrogen",
+    "code": "T",
+    "special": false
+  },
+  {
+    "id": 2,
+    "symbol": "He",
+    "name": "Helium",
+    "code": "S",
+    "special": false
+  },
+  {
+    "id": 3,
+    "symbol": "Li",
+    "name": "Lithium",
+    "code": "P",
+    "special": false
+  },
+  {
+    "id": 4,
+    "symbol": "Be",
+    "name": "Beryllium",
+    "code": "Hx",
+    "special": false
+  },
+  {
+    "id": 5,
+    "symbol": "B",
+    "name": "Boron",
+    "code": "Hp",
+    "special": false
+  },
+  {
+    "id": 6,
+    "symbol": "C",
+    "name": "Carbon",
+    "code": "O",
+    "special": false
+  },
+  {
+    "id": 7,
+    "symbol": "N",
+    "name": "Nitrogen",
+    "code": "TR",
+    "special": false
+  },
+  {
+    "id": 8,
+    "symbol": "O",
+    "name": "Oxygen",
+    "code": "SR",
+    "special": false
+  },
+  {
+    "id": 9,
+    "symbol": "F",
+    "name": "Fluorine",
+    "code": "PR",
+    "special": false
+  },
+  {
+    "id": 10,
+    "symbol": "Ne",
+    "name": "Neon",
+    "code": "HxR",
+    "special": false
+  },
+  {
+    "id": 11,
+    "symbol": "Na",
+    "name": "Sodium",
+    "code": "HpR",
+    "special": false
+  },
+  {
+    "id": 12,
+    "symbol": "Mg",
+    "name": "Magnesium",
+    "code": "OR",
+    "special": false
+  },
+  {
+    "id": 13,
+    "symbol": "Al",
+    "name": "Aluminium",
+    "code": "S-T",
+    "special": false
+  },
+  {
+    "id": 14,
+    "symbol": "Si",
+    "name": "Silicon",
+    "code": "P-S",
+    "special": false
+  },
+  {
+    "id": 15,
+    "symbol": "P",
+    "name": "Phosphorus",
+    "code": "Hx-P",
+    "special": false
+  },
+  {
+    "id": 16,
+    "symbol": "S",
+    "name": "Sulfur",
+    "code": "Hp-Hx",
+    "special": false
+  },
+  {
+    "id": 17,
+    "symbol": "Cl",
+    "name": "Chlorine",
+    "code": "O-Hp",
+    "special": false
+  },
+  {
+    "id": 18,
+    "symbol": "Ar",
+    "name": "Argon",
+    "code": "S-TR",
+    "special": false
+  },
+  {
+    "id": 19,
+    "symbol": "K",
+    "name": "Potassium",
+    "code": "SR-T",
+    "special": false
+  },
+  {
+    "id": 20,
+    "symbol": "Ca",
+    "name": "Calcium",
+    "code": "P-SR",
+    "special": false
+  },
+  {
+    "id": 21,
+    "symbol": "Sc",
+    "name": "Scandium",
+    "code": "PR-S",
+    "special": false
+  },
+  {
+    "id": 22,
+    "symbol": "Ti",
+    "name": "Titanium",
+    "code": "Hx-PR",
+    "special": false
+  },
+  {
+    "id": 23,
+    "symbol": "V",
+    "name": "Vanadium",
+    "code": "HxR-P",
+    "special": false
+  },
+  {
+    "id": 24,
+    "symbol": "Cr",
+    "name": "Chromium",
+    "code": "Hp-HxR",
+    "special": false
+  },
+  {
+    "id": 25,
+    "symbol": "Mn",
+    "name": "Manganese",
+    "code": "HpR-Hx",
+    "special": false
+  },
+  {
+    "id": 26,
+    "symbol": "Fe",
+    "name": "Iron",
+    "code": "O-HpR",
+    "special": false
+  },
+  {
+    "id": 27,
+    "symbol": "Co",
+    "name": "Cobalt",
+    "code": "OR-Hp",
+    "special": false
+  },
+  {
+    "id": 28,
+    "symbol": "Ni",
+    "name": "Nickel",
+    "code": "SR-TR",
+    "special": false
+  },
+  {
+    "id": 29,
+    "symbol": "Cu",
+    "name": "Copper",
+    "code": "PR-SR",
+    "special": false
+  },
+  {
+    "id": 30,
+    "symbol": "Zn",
+    "name": "Zinc",
+    "code": "HxR-PR",
+    "special": false
+  },
+  {
+    "id": 31,
+    "symbol": "Ga",
+    "name": "Gallium",
+    "code": "HpR-HxR",
+    "special": false
+  },
+  {
+    "id": 32,
+    "symbol": "Ge",
+    "name": "Germanium",
+    "code": "OR-HpR",
+    "special": false
+  },
+  {
+    "id": 33,
+    "symbol": "As",
+    "name": "Arsenic",
+    "code": "P-S-T",
+    "special": false
+  },
+  {
+    "id": 34,
+    "symbol": "Se",
+    "name": "Selenium",
+    "code": "Hx-P-S",
+    "special": false
+  },
+  {
+    "id": 35,
+    "symbol": "Br",
+    "name": "Bromine",
+    "code": "Hp-Hx-P",
+    "special": false
+  },
+  {
+    "id": 36,
+    "symbol": "Kr",
+    "name": "Krypton",
+    "code": "O-Hp-Hx",
+    "special": false
+  },
+  {
+    "id": 37,
+    "symbol": "Rb",
+    "name": "Rubidium",
+    "code": "P-S-TR",
+    "special": false
+  },
+  {
+    "id": 38,
+    "symbol": "Sr",
+    "name": "Strontium",
+    "code": "P-SR-T",
+    "special": false
+  },
+  {
+    "id": 39,
+    "symbol": "Y",
+    "name": "Yttrium",
+    "code": "PR-S-T",
+    "special": false
+  },
+  {
+    "id": 40,
+    "symbol": "Zr",
+    "name": "Zirconium",
+    "code": "Hx-P-SR",
+    "special": false
+  },
+  {
+    "id": 41,
+    "symbol": "Nb",
+    "name": "Niobium",
+    "code": "Hx-PR-S",
+    "special": false
+  },
+  {
+    "id": 42,
+    "symbol": "Mo",
+    "name": "Molybdenum",
+    "code": "HxR-P-S",
+    "special": false
+  },
+  {
+    "id": 43,
+    "symbol": "Tc",
+    "name": "Technetium",
+    "code": "Hp-Hx-PR",
+    "special": false
+  },
+  {
+    "id": 44,
+    "symbol": "Ru",
+    "name": "Ruthenium",
+    "code": "Hp-HxR-P",
+    "special": false
+  },
+  {
+    "id": 45,
+    "symbol": "Rh",
+    "name": "Rhodium",
+    "code": "HpR-Hx-P",
+    "special": false
+  },
+  {
+    "id": 46,
+    "symbol": "Pd",
+    "name": "Palladium",
+    "code": "O-Hp-HxR",
+    "special": false
+  },
+  {
+    "id": 47,
+    "symbol": "Ag",
+    "name": "Silver",
+    "code": "O-HpR-Hx",
+    "special": false
+  },
+  {
+    "id": 48,
+    "symbol": "Cd",
+    "name": "Cadmium",
+    "code": "OR-Hp-Hx",
+    "special": false
+  },
+  {
+    "id": 49,
+    "symbol": "In",
+    "name": "Indium",
+    "code": "P-SR-TR",
+    "special": false
+  },
+  {
+    "id": 50,
+    "symbol": "Sn",
+    "name": "Tin",
+    "code": "PR-S-TR",
+    "special": false
+  },
+  {
+    "id": 51,
+    "symbol": "Sb",
+    "name": "Antimony",
+    "code": "PR-SR-T",
+    "special": false
+  },
+  {
+    "id": 52,
+    "symbol": "Te",
+    "name": "Tellurium",
+    "code": "Hx-PR-SR",
+    "special": false
+  },
+  {
+    "id": 53,
+    "symbol": "I",
+    "name": "Iodine",
+    "code": "HxR-P-SR",
+    "special": false
+  },
+  {
+    "id": 54,
+    "symbol": "Xe",
+    "name": "Xenon",
+    "code": "HxR-PR-S",
+    "special": false
+  },
+  {
+    "id": 55,
+    "symbol": "Cs",
+    "name": "Caesium",
+    "code": "Hp-HxR-PR",
+    "special": false
+  },
+  {
+    "id": 56,
+    "symbol": "Ba",
+    "name": "Barium",
+    "code": "HpR-Hx-PR",
+    "special": false
+  },
+  {
+    "id": 57,
+    "symbol": "La",
+    "name": "Lanthanum",
+    "code": "HpR-HxR-P",
+    "special": false
+  },
+  {
+    "id": 58,
+    "symbol": "Ce",
+    "name": "Cerium",
+    "code": "O-HpR-HxR",
+    "special": false
+  },
+  {
+    "id": 59,
+    "symbol": "Pr",
+    "name": "Praseodymium",
+    "code": "OR-Hp-HxR",
+    "special": false
+  },
+  {
+    "id": 60,
+    "symbol": "Nd",
+    "name": "Neodymium",
+    "code": "OR-HpR-Hx",
+    "special": false
+  },
+  {
+    "id": 61,
+    "symbol": "Pm",
+    "name": "Promethium",
+    "code": "PR-SR-TR",
+    "special": false
+  },
+  {
+    "id": 62,
+    "symbol": "Sm",
+    "name": "Samarium",
+    "code": "HxR-PR-SR",
+    "special": false
+  },
+  {
+    "id": 63,
+    "symbol": "Eu",
+    "name": "Europium",
+    "code": "HpR-HxR-PR",
+    "special": false
+  },
+  {
+    "id": 64,
+    "symbol": "Gd",
+    "name": "Gadolinium",
+    "code": "OR-HpR-HxR",
+    "special": false
+  },
+  {
+    "id": 65,
+    "symbol": "Tb",
+    "name": "Terbium",
+    "code": "Hx-P-S-T",
+    "special": false
+  },
+  {
+    "id": 66,
+    "symbol": "Dy",
+    "name": "Dysprosium",
+    "code": "Hp-Hx-P-S",
+    "special": false
+  },
+  {
+    "id": 67,
+    "symbol": "Ho",
+    "name": "Holmium",
+    "code": "O-Hp-Hx-P",
+    "special": false
+  },
+  {
+    "id": 68,
+    "symbol": "Er",
+    "name": "Erbium",
+    "code": "Hx-P-S-TR",
+    "special": false
+  },
+  {
+    "id": 69,
+    "symbol": "Tm",
+    "name": "Thulium",
+    "code": "Hx-P-SR-T",
+    "special": false
+  },
+  {
+    "id": 70,
+    "symbol": "Yb",
+    "name": "Ytterbium",
+    "code": "Hx-PR-S-T",
+    "special": false
+  },
+  {
+    "id": 71,
+    "symbol": "Lu",
+    "name": "Lutetium",
+    "code": "HxR-P-S-T",
+    "special": false
+  },
+  {
+    "id": 72,
+    "symbol": "Hf",
+    "name": "Hafnium",
+    "code": "Hp-Hx-P-SR",
+    "special": false
+  },
+  {
+    "id": 73,
+    "symbol": "Ta",
+    "name": "Tantalum",
+    "code": "Hp-Hx-PR-S",
+    "special": false
+  },
+  {
+    "id": 74,
+    "symbol": "W",
+    "name": "Tungsten",
+    "code": "Hp-HxR-P-S",
+    "special": false
+  },
+  {
+    "id": 75,
+    "symbol": "Re",
+    "name": "Rhenium",
+    "code": "HpR-Hx-P-S",
+    "special": false
+  },
+  {
+    "id": 76,
+    "symbol": "Os",
+    "name": "Osmium",
+    "code": "O-Hp-Hx-PR",
+    "special": false
+  },
+  {
+    "id": 77,
+    "symbol": "Ir",
+    "name": "Iridium",
+    "code": "O-Hp-HxR-P",
+    "special": false
+  },
+  {
+    "id": 78,
+    "symbol": "Pt",
+    "name": "Platinum",
+    "code": "O-HpR-Hx-P",
+    "special": false
+  },
+  {
+    "id": 79,
+    "symbol": "Au",
+    "name": "Gold",
+    "code": "OR-Hp-Hx-P",
+    "special": false
+  },
+  {
+    "id": 80,
+    "symbol": "Hg",
+    "name": "Mercury",
+    "code": "Hx-P-SR-TR",
+    "special": false
+  },
+  {
+    "id": 81,
+    "symbol": "Tl",
+    "name": "Thallium",
+    "code": "Hx-PR-S-TR",
+    "special": false
+  },
+  {
+    "id": 82,
+    "symbol": "Pb",
+    "name": "Lead",
+    "code": "Hx-PR-SR-T",
+    "special": false
+  },
+  {
+    "id": 83,
+    "symbol": "Bi",
+    "name": "Bismuth",
+    "code": "HxR-P-S-TR",
+    "special": false
+  },
+  {
+    "id": 84,
+    "symbol": "Po",
+    "name": "Polonium",
+    "code": "HxR-P-SR-T",
+    "special": false
+  },
+  {
+    "id": 85,
+    "symbol": "At",
+    "name": "Astatine",
+    "code": "HxR-PR-S-T",
+    "special": false
+  },
+  {
+    "id": 86,
+    "symbol": "Rn",
+    "name": "Radon",
+    "code": "Hp-Hx-PR-SR",
+    "special": false
+  },
+  {
+    "id": 87,
+    "symbol": "Fr",
+    "name": "Francium",
+    "code": "Hp-HxR-P-SR",
+    "special": false
+  },
+  {
+    "id": 88,
+    "symbol": "Ra",
+    "name": "Radium",
+    "code": "Hp-HxR-PR-S",
+    "special": false
+  },
+  {
+    "id": 89,
+    "symbol": "Ac",
+    "name": "Actinium",
+    "code": "HpR-Hx-P-SR",
+    "special": false
+  },
+  {
+    "id": 90,
+    "symbol": "Th",
+    "name": "Thorium",
+    "code": "HpR-Hx-PR-S",
+    "special": false
+  },
+  {
+    "id": 91,
+    "symbol": "Pa",
+    "name": "Protactinium",
+    "code": "HpR-HxR-P-S",
+    "special": false
+  },
+  {
+    "id": 92,
+    "symbol": "U",
+    "name": "Uranium",
+    "code": "O-Hp-HxR-PR",
+    "special": false
+  },
+  {
+    "id": 93,
+    "symbol": "Np",
+    "name": "Neptunium",
+    "code": "O-HpR-Hx-PR",
+    "special": false
+  },
+  {
+    "id": 94,
+    "symbol": "Pu",
+    "name": "Plutonium",
+    "code": "O-HpR-HxR-P",
+    "special": false
+  },
+  {
+    "id": 95,
+    "symbol": "Am",
+    "name": "Americium",
+    "code": "OR-Hp-Hx-PR",
+    "special": false
+  },
+  {
+    "id": 96,
+    "symbol": "Cm",
+    "name": "Curium",
+    "code": "OR-Hp-HxR-P",
+    "special": false
+  },
+  {
+    "id": 97,
+    "symbol": "Bk",
+    "name": "Berkelium",
+    "code": "OR-HpR-Hx-P",
+    "special": false
+  },
+  {
+    "id": 98,
+    "symbol": "Cf",
+    "name": "Californium",
+    "code": "Hx-PR-SR-TR",
+    "special": false
+  },
+  {
+    "id": 99,
+    "symbol": "Es",
+    "name": "Einsteinium",
+    "code": "HxR-P-SR-TR",
+    "special": false
+  },
+  {
+    "id": 100,
+    "symbol": "Fm",
+    "name": "Fermium",
+    "code": "HxR-PR-S-TR",
+    "special": false
+  },
+  {
+    "id": 101,
+    "symbol": "Md",
+    "name": "Mendelevium",
+    "code": "HxR-PR-SR-T",
+    "special": false
+  },
+  {
+    "id": 102,
+    "symbol": "No",
+    "name": "Nobelium",
+    "code": "Hp-HxR-PR-SR",
+    "special": false
+  },
+  {
+    "id": 103,
+    "symbol": "Lr",
+    "name": "Lawrencium",
+    "code": "HpR-Hx-PR-SR",
+    "special": false
+  },
+  {
+    "id": 104,
+    "symbol": "Rf",
+    "name": "Rutherfordium",
+    "code": "HpR-HxR-P-SR",
+    "special": false
+  },
+  {
+    "id": 105,
+    "symbol": "Db",
+    "name": "Dubnium",
+    "code": "HpR-HxR-PR-S",
+    "special": false
+  },
+  {
+    "id": 106,
+    "symbol": "Sg",
+    "name": "Seaborgium",
+    "code": "O-HpR-HxR-PR",
+    "special": false
+  },
+  {
+    "id": 107,
+    "symbol": "Bh",
+    "name": "Bohrium",
+    "code": "OR-Hp-HxR-PR",
+    "special": false
+  },
+  {
+    "id": 108,
+    "symbol": "Hs",
+    "name": "Hassium",
+    "code": "OR-HpR-Hx-PR",
+    "special": false
+  },
+  {
+    "id": 109,
+    "symbol": "Mt",
+    "name": "Meitnerium",
+    "code": "OR-HpR-HxR-P",
+    "special": false
+  },
+  {
+    "id": 110,
+    "symbol": "Ds",
+    "name": "Darmstadtium",
+    "code": "HxR-PR-SR-TR",
+    "special": false
+  },
+  {
+    "id": 111,
+    "symbol": "Rg",
+    "name": "Roentgenium",
+    "code": "HpR-HxR-PR-SR",
+    "special": false
+  },
+  {
+    "id": 112,
+    "symbol": "Cn",
+    "name": "Copernicium",
+    "code": "OR-HpR-HxR-PR",
+    "special": false
+  },
+  {
+    "id": 113,
+    "symbol": "Nh",
+    "name": "Nihonium",
+    "code": "Hp-Hx-P-S-T",
+    "special": false
+  },
+  {
+    "id": 114,
+    "symbol": "Fl",
+    "name": "Flerovium",
+    "code": "O-Hp-Hx-P-S",
+    "special": false
+  },
+  {
+    "id": 115,
+    "symbol": "Mc",
+    "name": "Moscovium",
+    "code": "Hp-Hx-P-S-TR",
+    "special": false
+  },
+  {
+    "id": 116,
+    "symbol": "Lv",
+    "name": "Livermorium",
+    "code": "Hp-Hx-P-SR-T",
+    "special": false
+  },
+  {
+    "id": 117,
+    "symbol": "Ts",
+    "name": "Tennessine",
+    "code": "Hp-Hx-PR-S-T",
+    "special": false
+  },
+  {
+    "id": 118,
+    "symbol": "Og",
+    "name": "Oganesson",
+    "code": "Hp-HxR-P-S-T",
+    "special": false
+  },
+  {
+    "id": 119,
+    "symbol": "Ma",
+    "name": "Mana",
+    "code": null,
+    "special": true
+  },
+  {
+    "id": 120,
+    "symbol": "Vo",
+    "name": "Void",
+    "code": null,
+    "special": true
+  },
+  {
+    "id": 121,
+    "symbol": "Li",
+    "name": "Light",
+    "code": null,
+    "special": true
+  },
+  {
+    "id": 122,
+    "symbol": "Da",
+    "name": "Darkness",
+    "code": null,
+    "special": true
+  },
+  {
+    "id": 123,
+    "symbol": "Ho",
+    "name": "Holy",
+    "code": null,
+    "special": true
+  },
+  {
+    "id": 124,
+    "symbol": "Uh",
+    "name": "Unholy",
+    "code": null,
+    "special": true
+  }
+]

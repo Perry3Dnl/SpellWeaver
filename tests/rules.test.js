@@ -1,0 +1,11 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import elements from '../src/elements.json' with {type:'json'};
+import {AMPS,RINGS,RUNES,AXES,initialSpell,ampConflict,validateSpell,normalizeImport} from '../src/rules.js';
+import {polar} from '../src/geometry.js';
+test('catalogue uses all 118 unique chemical codes plus six magical elements',()=>{assert.equal(elements.length,124);assert.equal(new Set(elements.slice(0,118).map(e=>e.code)).size,118);assert.deepEqual(elements.slice(-6).map(e=>e.name),['Mana','Void','Light','Darkness','Holy','Unholy'])});
+test('ring and rune catalogues match v37',()=>{assert.equal(RINGS.length,26);assert.equal(RUNES.length,26);assert.equal(RUNES[25].name,'Zone')});
+test('five Amp tiers and legal diagonal axes',()=>{assert.deepEqual(AMPS.map(a=>a.multiplier),[1.2,1.4,1.6,1.8,2]);assert.deepEqual(AXES,[45,135,225,315])});
+test('automatic center is visible Void and initial ring exists',()=>{const s=initialSpell();assert.equal(s.center.id,120);assert.equal(s.rings.length,2);assert.deepEqual(validateSpell(s),[])});
+test('adjacent same-axis Amps are invalid but non-adjacent legal',()=>{const s=initialSpell();s.rings.push({id:3,radius:204,pattern:'Smooth'});s.amps.push({id:1,ringId:1,angle:45,tier:'Gold',rank:5});assert.equal(ampConflict(s.amps,2,45),true);assert.equal(ampConflict(s.amps,3,45),false);s.amps.push({id:2,ringId:2,angle:45,tier:'Gold',rank:5});assert.ok(validateSpell(s).some(x=>x.includes('conflict')))});
+test('element coordinates sit exactly on ring line',()=>{for(const angle of [0,45,90,180,270]){const [x,y]=polar(angle,96);assert.ok(Math.abs(Math.hypot(x-250,y-250)-96)<1e-10)}});
+test('untrusted imports are constrained and preserve valid spell geometry',()=>{const s=initialSpell();assert.deepEqual(normalizeImport(s,elements),s);assert.throws(()=>normalizeImport({...s,center:{id:999}},elements),/Unknown center/);assert.throws(()=>normalizeImport({...s,strokes:new Array(2001).fill({})},elements),/safety limits/)});
