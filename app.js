@@ -2,6 +2,7 @@ import elements from './src/elements.json' with {type:'json'};
 import {AXES,AMPS,RINGS,RUNES,initialSpell,ampConflict,validateSpell,normalizeImport} from './src/rules.js';
 import {polar,renderSpell,measureInk} from './src/geometry.js';
 import {STARTER_CARDS} from './src/starter-cards.js';
+import {MATERIAL_CARDS} from './src/material-cards.js';
 import {nextPlacementAngle} from './src/placement.js';
 let spell=initialSpell(),tab='elements',search='',selected=null,tool='select',history=[],future=[],drawing=null;let nextId=1,placementRingId=null;
 const $=id=>document.getElementById(id),canvas=$('circle'),ctx=canvas.getContext('2d');
@@ -28,10 +29,10 @@ function selectedCatalogueEntry(){
  if(selected.type==='ring')return {tab:'rings',key:o.pattern};
  if(selected.type==='rune')return {tab:'runes',key:o.letter};
  if(selected.type==='amp')return {tab:'amps',key:o.tier};
- if(selected.type==='card')return {tab:'cards',key:o.template.id};
+ if(selected.type==='card')return {tab:o.template.kind==='material'?'materials':'cards',key:o.template.id};
  return null;
 }
-function catalogueKey(v){return tab==='elements'?v.id:tab==='runes'?v.letter:tab==='cards'?v.id:v.name}
+function catalogueKey(v){return tab==='elements'?v.id:tab==='runes'?v.letter:(tab==='cards'||tab==='materials')?v.id:v.name}
 function focusCatalogueOnSelection(){
  const entry=selectedCatalogueEntry();
  if(!entry)return;
@@ -47,20 +48,21 @@ function catalogue(){
  syncCatalogueToSelection();
  const el=$('catalogue');
  $('catalogue-hint').hidden=tab!=='cards';
+ $('materials-hint').hidden=tab!=='materials';
  el.replaceChildren();
- const values=tab==='elements'?elements:tab==='runes'?RUNES:tab==='rings'?RINGS:tab==='cards'?STARTER_CARDS:AMPS;
+ const values=tab==='elements'?elements:tab==='runes'?RUNES:tab==='rings'?RINGS:tab==='cards'?STARTER_CARDS:tab==='materials'?MATERIAL_CARDS:AMPS;
  const current=selectedCatalogueEntry();
- for(const v of values.filter(v=>`${v.name} ${v.symbol||''} ${v.code||''} ${v.letter||''}`.toLowerCase().includes(search.toLowerCase()))){
+ for(const v of values.filter(v=>`${v.name} ${v.symbol||''} ${v.code||''} ${v.letter||''} ${v.description||''} ${v.category||''}`.toLowerCase().includes(search.toLowerCase()))){
   const b=document.createElement('button');
   const active=current?.tab===tab && current.key===catalogueKey(v);
-  if(tab==='cards'){b.classList.add('starter-card');b.title=v.description;b.setAttribute('aria-description',v.description)}
+  if(tab==='cards'||tab==='materials'){b.classList.add('starter-card');b.title=v.description;b.setAttribute('aria-description',v.description)}
   b.classList.toggle('catalogue-selected',active);
   b.setAttribute('aria-pressed',String(active));
   if(active)b.setAttribute('aria-label',`${v.name} — selected`);
-  const symbol=document.createElement('span');symbol.className='symbol';symbol.textContent=tab==='elements'?(v.special?'✧':v.code?.replaceAll('-','·')):tab==='runes'?`ᚷ${v.letter}`:tab==='rings'?'◉':tab==='cards'?'▣':'◇◇';
+  const symbol=document.createElement('span');symbol.className='symbol';symbol.textContent=tab==='elements'?(v.special?'✧':v.code?.replaceAll('-','·')):tab==='runes'?`ᚷ${v.letter}`:tab==='rings'?'◉':(tab==='cards'||tab==='materials')?'▣':'◇◇';
   symbol.style.fontSize=tab==='elements'&&!v.special?'12px':'25px';
   const name=document.createElement('span');name.className='itemname';name.textContent=v.name;
-  const meta=document.createElement('span');meta.className='itemmeta';meta.textContent=tab==='elements'?`${v.id} · ${v.symbol}`:tab==='runes'?`${v.letter} · rune`:tab==='rings'?v.effect:tab==='cards'?v.ingredients.join(' + '):`×${v.multiplier.toFixed(1)} · ${v.name}`;
+  const meta=document.createElement('span');meta.className='itemmeta';meta.textContent=tab==='elements'?`${v.id} · ${v.symbol}`:tab==='runes'?`${v.letter} · rune`:tab==='rings'?v.effect:(tab==='cards'||tab==='materials')?(tab==='materials'?v.category:v.ingredients.join(' + ')):`×${v.multiplier.toFixed(1)} · ${v.name}`;
   b.append(symbol,name,meta);b.onclick=()=>addComponent(v);el.append(b);
  }
  if(!el.children.length)el.textContent='No matching components.';
@@ -68,7 +70,7 @@ function catalogue(){
 }
 
 function addComponent(v){
- if(tab==='cards'){
+ if(tab==='cards'||tab==='materials'){
   const current=object();
   if(!placementRing() && selected?.type==='card' && current){
    if(current.template.id!==v.id){commit();current.template=structuredClone(v);toast(`Card replaced with ${v.name}`)}

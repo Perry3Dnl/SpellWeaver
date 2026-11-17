@@ -9,3 +9,6 @@
 .catalogue button.catalogue-selected .itemname{color:#c7f8ff}
 
 .tabs{grid-template-columns:repeat(5,minmax(0,1fr))}.tabs button{font-size:10px}.catalogue-hint{font-size:11px;color:#aab7cc;line-height:1.6;padding:10px 4px}.catalogue button.starter-card{height:auto;min-height:124px;padding:12px 8px}.catalogue button.starter-card .symbol{font-size:25px!important}.catalogue button.starter-card .itemname{font-size:12px}.catalogue button.starter-card .itemmeta{white-space:normal;line-height:1.4;max-height:48px;overflow:hidden;text-align:center}
+
+/* Six catalogue tabs: scrollable on narrow screens rather than clipping labels. */
+.tabs{display:flex;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;gap:2px;grid-template-columns:none}.tabs button{flex:1 0 auto;padding:11px 8px}.catalogue button.starter-card .itemname{white-space:normal;line-height:1.25;text-align:center}
