@@ -71,7 +71,7 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(self.request("/",origin=False)[0],401)
     def test_csrf_and_login_throttling(self):
         self.assertEqual(self.request("/api/login",{"username":"bob","password":"test-only-pin"},origin=False)[0],403)
-        for _ in range(4): self.assertEqual(self.request("/api/login",{"username":"bob","password":"wrong"})[0],401)
+        for _ in range(5): self.assertEqual(self.request("/api/login",{"username":"bob","password":"wrong"})[0],401)
         self.assertEqual(self.request("/api/login",{"username":"bob","password":"wrong"})[0],429)
     def test_session_tamper(self):
         sw.SESSION_SECRET = "stable-secret-for-unit-tests-32-char-xyz"
