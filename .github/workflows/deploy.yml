@@ -14,6 +14,7 @@ jobs:
     timeout-minutes: 20
     environment: production
     env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
       DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
       DEPLOY_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
@@ -50,9 +51,15 @@ jobs:
           test "$(ssh-keygen -lf "$RUNNER_TEMP/sw-ssh/known_hosts" -E sha256 | awk 'NR==1 {print $2}')" = "$DEPLOY_HOST_KEY_FINGERPRINT" || { echo 'SSH host fingerprint mismatch' >&2; exit 1; }
           SSH_OPTS=(-o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/sw-ssh/known_hosts" -o PubkeyAuthentication=no -o PreferredAuthentications=password,keyboard-interactive -p "$DEPLOY_PORT")
           remote="$DEPLOY_USER@$DEPLOY_HOST"
+          umask 077
+          # Config is only on the runner and private host directory; never bundled in dist.
+          printf 'SPELLWEAVER_DEMO_USERNAME=bob\nOPENAI_API_KEY=%s\n' \
+            "$OPENAI_API_KEY" > "$RUNNER_TEMP/sw-ssh/runtime.env"
           tar -czf "$RUNNER_TEMP/spellweaver.tar.gz" -C dist .
           # This transfer touches only /opt/spellweaver. It never overwrites the shared Caddyfile.
-          sshpass -f "$RUNNER_TEMP/sw-ssh/password" ssh "${SSH_OPTS[@]}" "$remote" "mkdir -p /opt/spellweaver/deploy"
+          sshpass -f "$RUNNER_TEMP/sw-ssh/password" ssh "${SSH_OPTS[@]}" "$remote" "mkdir -p /opt/spellweaver/deploy /opt/spellweaver/private && chmod 700 /opt/spellweaver/private"
+          sshpass -f "$RUNNER_TEMP/sw-ssh/password" scp -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/sw-ssh/known_hosts" -o PubkeyAuthentication=no -o PreferredAuthentications=password,keyboard-interactive -P "$DEPLOY_PORT" \
+            "$RUNNER_TEMP/sw-ssh/runtime.env" "$remote:/opt/spellweaver/private/runtime.env"
           sshpass -f "$RUNNER_TEMP/sw-ssh/password" scp -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/sw-ssh/known_hosts" -o PubkeyAuthentication=no -o PreferredAuthentications=password,keyboard-interactive -P "$DEPLOY_PORT" \
             "$RUNNER_TEMP/spellweaver.tar.gz" "$remote:/opt/spellweaver/.release-$GITHUB_SHA.tar.gz"
           sshpass -f "$RUNNER_TEMP/sw-ssh/password" scp -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/sw-ssh/known_hosts" -o PubkeyAuthentication=no -o PreferredAuthentications=password,keyboard-interactive -P "$DEPLOY_PORT" \
@@ -64,7 +71,8 @@ jobs:
           set -euo pipefail
           for attempt in $(seq 1 15); do
             if curl -fsSL --max-time 12 -H 'Cache-Control: no-cache' "https://spellweaver.perry3d.nl/version.json?revision=$GITHUB_SHA" | grep -Fq "$GITHUB_SHA";then
-              curl -fsSL --max-time 12 https://spellweaver.perry3d.nl/ | grep -Fq 'SPELLWEAVER' && exit 0
+              test "$(curl -sS --max-time 12 -o /dev/null -w '%{http_code}' https://spellweaver.perry3d.nl/)" = "302" || exit 1
+              curl -fsSL --max-time 12 https://spellweaver.perry3d.nl/login | grep -Fq 'SpellWeaver' && exit 0
             fi
             sleep 3
           done
