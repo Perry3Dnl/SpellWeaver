@@ -74,7 +74,7 @@ jobs:
           set -euo pipefail
           for attempt in $(seq 1 15); do
             if curl -fsSL --max-time 12 -H 'Cache-Control: no-cache' "https://spellweaver.perry3d.nl/version.json?revision=$GITHUB_SHA" | grep -Fq "$GITHUB_SHA";then
-              test "$(curl -sS --max-time 12 -o /dev/null -w '%{http_code}' https://spellweaver.perry3d.nl/)" = "401" || exit 1
+              test "$(curl -sS --max-time 12 -o /dev/null -w '%{http_code}' https://spellweaver.perry3d.nl/)" = "302" || exit 1
               curl -fsSL --max-time 12 https://spellweaver.perry3d.nl/login | grep -Fq 'SpellWeaver' && exit 0
             fi
             sleep 3
