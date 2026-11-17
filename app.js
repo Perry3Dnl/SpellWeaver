@@ -85,7 +85,7 @@ function addComponent(v){
 
  // The catalogue edits the selected component of the matching kind, rather than
  // silently adding a second element to the outermost ring.
- if(!placementRing() && selected && (selected.type===tab.slice(0,-1) || (selected.type==='center'&&tab==='elements') || (selected.type==='element'&&tab==='elements') || (selected.type==='ring'&&tab==='rings') || (selected.type==='rune'&&tab==='runes') || (selected.type==='amp'&&tab==='amps'))){
+ if((selected?.type==='ring'&&tab==='rings'||!placementRing()) && selected && (selected.type===tab.slice(0,-1) || (selected.type==='center'&&tab==='elements') || (selected.type==='element'&&tab==='elements') || (selected.type==='ring'&&tab==='rings') || (selected.type==='rune'&&tab==='runes') || (selected.type==='amp'&&tab==='amps'))){
   const o=object();
   if(o){
    if(selected.type==='center'){
