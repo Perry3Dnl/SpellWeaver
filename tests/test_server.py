@@ -52,7 +52,9 @@ class ServerTests(unittest.TestCase):
     def test_locked_without_session(self):
         for path in ["/app.js", "/src/elements.json"]:
             self.assertEqual(self.request(path)[0],401)
-        self.assertEqual(self.request("/")[0],200)\n        self.assertEqual(self.request("/index.html")[0],200)\n        self.assertEqual(self.request("/login")[0],200)
+        self.assertEqual(self.request("/")[0],200)
+        self.assertEqual(self.request("/index.html")[0],200)
+        self.assertEqual(self.request("/login")[0],200)
         self.assertEqual(self.request("/login.js")[0],200)
         self.assertEqual(self.request("/login.css")[0],200)
         self.assertEqual(self.request("/version.json")[0],200)
