@@ -9,7 +9,8 @@ test('the menu opens a rendered Water preview, lesson, and existing creator',asy
  let strokes=0,root;
  const ctx=new Proxy({}, {get:(obj,key)=>key in obj?obj[key]:(...args)=>{if(key==='stroke')strokes++;}});
  const element=()=>({
-  hidden:false,onclick:null,
+  hidden:false,onclick:null,classList:{toggle(){}},
+  append(){},
   getContext:()=>ctx,
   set innerHTML(html){
    this.html=html;
@@ -39,13 +40,17 @@ test('the menu opens a rendered Water preview, lesson, and existing creator',asy
   root.querySelector('#academy-book').onclick();
   assert.match(root.innerHTML,/id="academy-collection-circle"/);
   assert.match(root.innerHTML,/Locked · Preview/);
+  assert.match(root.innerHTML,/Mana/);
+  assert.match(root.innerHTML,/academy-collection-selector/);
   assert.ok(strokes>0,'the shared geometry renderer draws the actual Water inscription');
   root.querySelector('#academy-study').onclick();
-  assert.match(root.innerHTML,/Water foundations/);
+  assert.match(root.innerHTML,/Mana Study/);
   completeWaterLesson(storage);
+  // Existing Water progress is preserved even when the new curriculum is shown.
+  root.querySelector('#academy-back').onclick();
   root.querySelector('#academy-back').onclick();
   root.querySelector('#academy-book').onclick();
-  assert.match(root.innerHTML,/✓ Learned/);
+  assert.match(root.innerHTML,/Mana Study/);
   root.querySelector('#academy-back').onclick();
   root.querySelector('#academy-create').onclick();
   assert.equal(editor.hidden,false);
