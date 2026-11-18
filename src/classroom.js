@@ -34,7 +34,10 @@ function render(view){
  if(view==='collection'){
  const progress=readClassroom(STORAGE);
  const unlocked=progress.learnedCards.includes('water');
- root.innerHTML=`<div class="academy-menu"><span class="eyebrow">THE GRIMOIRE</span><h1>My Collection</h1><p>Classroom progress is stored in this browser, not in a player account.</p><div class="academy-collection"><h2>Water — experimental starter card</h2><p>${unlocked?'Learned through Classroom. This is a study design, not a certified castable spell.':'Locked — complete the Water foundations lesson.'}</p></div><button id="academy-back">← Main Menu</button></div>`;
+ root.innerHTML=`<div class="academy-menu academy-collection-page"><span class="eyebrow">THE GRIMOIRE</span><h1>My Collection</h1><p>Spell studies learned in Classroom. Progress is saved in this browser.</p><div class="academy-collection"><div class="academy-collection-preview"><canvas id="academy-collection-circle" width="500" height="500" aria-label="Water starter card rendered with the Spell Creator"></canvas></div><div class="academy-collection-details"><span class="eyebrow">STARTER CARD · V37</span><h2>Water</h2><span class="academy-card-status">${unlocked?'✓ Learned':'Locked · Preview'}</span><p>The same experimental Water inscription taught in Classroom, built from existing Spell Creator components.</p><dl><div><dt>Center</dt><dd>Oxygen</dd></div><div><dt>Ring</dt><dd>Wavy · Oscillation</dd></div><div><dt>Ingredients</dt><dd>Hydrogen × 2, Oxygen × 1</dd></div><div><dt>Rune</dt><dd>Bind (B)</dd></div></dl><p class="academy-card-note">${unlocked?'Added to your classroom collection.':'Complete the Water foundations lesson to unlock this study card.'} This is a study design, not a validated castable spell.</p><button id="academy-study" class="gold-btn">${unlocked?'Review lesson':'Learn this spell'} →</button></div></div><button id="academy-back">← Main Menu</button></div>`;
+ const preview=root.querySelector('#academy-collection-circle');
+ renderSpell(preview.getContext('2d'),lessonSpell(WATER_LESSON_STEPS.length-1),elements,{guides:false});
+ root.querySelector('#academy-study').onclick=()=>{step=0;show('class')};
  root.querySelector('#academy-back').onclick=()=>show('menu');
  return;
  }
