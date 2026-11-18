@@ -89,3 +89,5 @@ The game uses the visible browser viewport (including dynamic mobile viewport he
 ### Balanced Water classroom inscription
 
 The experimental Water starter card is now a half-turn-symmetric composition: Oxygen is the central element, two Hydrogen sigils are opposite at 90° and 270° on a Wavy ring, and the two Bind runes are opposite at 0° and 180° on the after track. There is no redundant off-center Oxygen. Classroom, Collection, and the reusable Water card all read the same starter-card source through the existing v37 renderer. Individual construction steps may be incomplete until the mirrored partner is added; the final inscription is symmetrical. This is an ink-design correction, not a newly validated chemical reaction or spell effect.
+
+The opposite Hydrogen symbol is also rotated 180°, as is the opposite Bind rune, so their directional strokes form a half-turn-symmetric picture (not merely mirrored coordinates). The shared renderer supports optional rune rotation without changing unrotated runes elsewhere.
