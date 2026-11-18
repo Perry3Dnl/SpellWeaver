@@ -176,3 +176,38 @@ main{flex:1 1 auto;width:100%;min-height:0;height:auto;overflow:hidden;grid-temp
  .academy-icon-tile{padding:8px}
  .catalogue .catalogue-icon{width:46px;height:46px;flex-basis:46px}
 }
+
+
+/* Full-size study drawings with browser-safe collection navigation. */
+.academy-collection-page{max-width:1170px}
+.academy-collection{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:stretch}
+.academy-collection-preview{width:100%;min-height:340px;padding:clamp(4px,1vw,14px)}
+#academy-collection-circle{width:min(100%,480px);max-height:min(62dvh,480px);height:auto;aspect-ratio:1}
+.academy-collection-details{align-self:center}
+.academy-collection-selector{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.academy-collection-selector button{font-size:12px;padding:9px 12px}
+.academy-collection-selector button.active{border-color:#ddb876;background:#32372e;color:#f6dea3}
+.academy-lesson-menu{max-width:1050px}
+.academy-lesson-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0}
+.academy-lesson-choice{text-align:left;line-height:1.5;min-height:110px;background:#1b2b32;border-color:#766447;color:#f0dcab}
+@media(max-width:850px){.academy-lesson-choices{grid-template-columns:1fr}.academy-lesson-choice{min-height:62px}}
+@media(max-width:680px){
+ .academy-collection{grid-template-columns:1fr}
+ .academy-collection-preview{min-height:0}
+ #academy-collection-circle{width:min(100%,400px);max-height:min(48dvh,400px)}
+}
+
+
+/* Classroom projectile is an explicit visual concept, not a casting engine. */
+.academy-shot-demo{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:5px 2px}
+.academy-shot-track{position:relative;flex:1 1 190px;min-width:160px;height:32px;overflow:hidden;border:1px solid #5e5f4e;border-radius:30px;background:#0a2326}
+.academy-shot-origin,.academy-shot-target{position:absolute;top:50%;transform:translateY(-50%);color:#ebc27b;font-size:21px}
+.academy-shot-origin{left:8px}.academy-shot-target{right:8px}
+.academy-shot-fireball{position:absolute;top:50%;left:26px;width:16px;height:16px;transform:translateY(-50%);border-radius:50%;background:radial-gradient(circle,#fff7c7 0%,#ffa23c 40%,#ee4325 78%,transparent 100%);box-shadow:0 0 15px #ef732e,0 0 25px #b24621;opacity:.15}
+.academy-shot-track.firing .academy-shot-fireball{animation:academy-fire-shot 1.2s ease-in forwards}
+@keyframes academy-fire-shot{0%{left:26px;opacity:1}85%{opacity:1}100%{left:calc(100% - 45px);opacity:0}}
+.academy-shot-demo small{color:#bfc5cb;font-size:10px}
+@media(prefers-reduced-motion:reduce){.academy-shot-track.firing .academy-shot-fireball{animation:none;left:calc(100% - 45px);opacity:1}}
+
+/* Reserve a natural-height row for the optional projectile demonstration. */
+.academy-class:has(.academy-shot-demo){grid-template-rows:auto minmax(0,1fr) auto auto auto}
