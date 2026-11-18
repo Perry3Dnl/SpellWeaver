@@ -54,8 +54,8 @@ function render(view){
  }
  if(view==='lessons'){
   const progress=readClassroom(STORAGE);
-  root.innerHTML=`<div class="academy-menu academy-lesson-menu"><span class="eyebrow">ARCANE ACADEMY / BEGINNER STUDIES</span><h1>Classroom</h1><p>Start with Mana, study Fire, then combine them into an intended projectile. Each lesson builds its inscription step by step.</p><div class="academy-lesson-choices"></div><button id="academy-back">← Main Menu</button></div>`;
-  const list=root.querySelector('.academy-lesson-choices');
+  root.innerHTML=`<div class="academy-menu academy-lesson-menu"><span class="eyebrow">ARCANE ACADEMY / BEGINNER STUDIES</span><h1>Classroom</h1><p>Start with Mana, study Fire, then combine them into an intended projectile. Each lesson builds its inscription step by step.</p><div id="academy-lesson-choices" class="academy-lesson-choices"></div><button id="academy-back">← Main Menu</button></div>`;
+  const list=root.querySelector('#academy-lesson-choices');
   ACADEMY_LESSONS.forEach((lesson,index)=>{
    const choice=document.createElement('button');choice.className='academy-lesson-choice';
    const done=progress.completedLessons.includes(lesson.id);
