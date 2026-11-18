@@ -1,6 +1,7 @@
 import elements from './src/elements.json' with {type:'json'};
 import {AXES,AMPS,RINGS,RUNES,initialSpell,ampConflict,validateSpell,normalizeImport} from './src/rules.js';
 import {polar,renderSpell,measureInk} from './src/geometry.js';
+import {renderComponentIcon} from './src/icon-gallery.js';
 import {STARTER_CARDS} from './src/starter-cards.js';
 import {MATERIAL_CARDS} from './src/material-cards.js';
 import {nextPlacementAngle} from './src/placement.js';
@@ -61,8 +62,11 @@ function catalogue(){
   b.classList.toggle('catalogue-selected',active);
   b.setAttribute('aria-pressed',String(active));
   if(active)b.setAttribute('aria-label',`${v.name} — selected`);
-  const symbol=document.createElement('span');symbol.className='symbol';symbol.textContent=tab==='elements'?(v.special?'✧':v.code?.replaceAll('-','·')):tab==='runes'?`ᚷ${v.letter}`:tab==='rings'?'◉':(tab==='cards'||tab==='materials')?'▣':'◇◇';
-  symbol.style.fontSize=tab==='elements'&&!v.special?'12px':'25px';
+  const symbol=document.createElement('canvas');
+  symbol.className='catalogue-icon';
+  symbol.width=96;symbol.height=96;
+  symbol.setAttribute('aria-hidden','true');
+  renderComponentIcon(symbol,tab,v);
   const name=document.createElement('span');name.className='itemname';name.textContent=v.name;
   const meta=document.createElement('span');meta.className='itemmeta';meta.textContent=tab==='elements'?`${v.id} · ${v.symbol}`:tab==='runes'?`${v.letter} · rune`:tab==='rings'?v.effect:(tab==='cards'||tab==='materials')?(tab==='materials'?v.category:v.ingredients.join(' + ')):`×${v.multiplier.toFixed(1)} · ${v.name}`;
   b.append(symbol,name,meta);if(tab==='cards'||tab==='materials'){b.onclick=e=>cardClicks.click(v,e);b.ondblclick=e=>{e.preventDefault();cardClicks.doubleClick(v)}}else b.onclick=()=>{cardClicks.cancel();addComponent(v)};el.append(b);
