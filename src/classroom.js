@@ -59,8 +59,10 @@ function render(view){
   ACADEMY_LESSONS.forEach((lesson,index)=>{
    const choice=document.createElement('button');choice.className='academy-lesson-choice';
    const done=progress.completedLessons.includes(lesson.id);
-   choice.textContent=lesson.title+' — '+lesson.subtitle+(done?' ✓ Learned':'');
-   choice.onclick=()=>{lessonIndex=index;step=0;show('class')};
+   const locked=index>0&&!progress.completedLessons.includes(ACADEMY_LESSONS[index-1].id);
+   choice.disabled=locked;
+   choice.textContent=lesson.title+' — '+lesson.subtitle+(done?' ✓ Learned':locked?' · Finish previous lesson first':'');
+   choice.onclick=()=>{if(locked)return;lessonIndex=index;step=0;show('class')};
    list.append(choice);
   });
   root.querySelector('#academy-back').onclick=()=>show('menu');
