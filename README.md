@@ -73,3 +73,9 @@ To verify production, unauthenticated `/` should redirect to `/login`, unauthent
 No manually provisioned session secret is required: the backend generates one at startup. Logging in again after a deployment or container restart is expected. All setup is done in GitHub Actions secrets; no SSH or server commands are required from the project owner.
 
 The login uses exactly the requested username and password, without user-provisioned session credentials. Only the optional OpenAI API key is configured through GitHub Actions. No server shell access is required.
+
+## Academy main menu and Classroom (browser-only)
+
+After authenticated login, the main menu now offers **Classroom**, **Spell Creator**, and **My Collection**. Spell Creator is the same existing editor; its editing behavior and data model are unchanged. The classroom board calls the existing `renderSpell` from `src/geometry.js` and displays incremental, valid slices of the **existing Water starter card** defined in `src/starter-cards.js`. It teaches Oxygen center, Wavy ring, two Hydrogen components, one Oxygen component, and the Bind rune. The dialogue uses a fixed Next/Previous sequence. The completed study card appears in My Collection.
+
+Progress is stored in this browser's localStorage under `spellweaver.classroom.v1`. This is **not** synchronized across browsers or demo users, and the collection entry is **educational only**: the Water formula is still an experimental ink template, not a certified executable water spell. Mana and stability are not fabricated. Existing editor snapshot/export behavior is unaffected. Run `npm run check` to exercise classroom source/lesson tests and the production bundle.
