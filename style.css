@@ -47,3 +47,7 @@
 .academy-controls button{white-space:nowrap}
 .academy-finished{color:#b9dcbd}
 @media(max-width:680px){#academy{padding:12px}.academy-menu{padding:15px}.academy-options{grid-template-columns:1fr;gap:10px;margin:25px 0}.academy-options button{min-height:95px}.academy-class-top{flex-wrap:wrap}.academy-board{border-width:6px}.academy-dialogue{gap:10px}.academy-professor{width:46px;height:46px}.academy-controls{gap:7px}.academy-controls button{padding:8px;font-size:11px}}
+
+/* Preserve access to Main Menu on narrow browsers while inside Spell Creator. */
+@media(max-width:850px){header nav{display:flex;gap:0}header nav span{display:none}#academy-nav{font-size:11px;padding:8px}}
+@media(max-width:400px){.head-right{gap:4px}header{gap:7px;padding:0 8px}.brand{gap:7px}.brandmark{width:30px;height:30px;font-size:21px}}
