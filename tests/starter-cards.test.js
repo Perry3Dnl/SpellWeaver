@@ -39,10 +39,10 @@ test('Water starter card preserves 180-degree balance on each component track',(
  assert.equal(water.center.id,8,'Oxygen is the central atom');
  assert.equal(water.rings[0].pattern,'Wavy');
  assert.deepEqual(water.elements.map(({elementId,angle,scale,rotation})=>[elementId,angle,scale,rotation]),[
-  [1,90,.72,0],[1,270,.72,0]
+  [1,90,.72,0],[1,270,.72,180]
  ]);
- assert.deepEqual(water.runes.map(({letter,angle,side})=>[letter,angle,side]),[
-  ['B',0,'after'],['B',180,'after']
+ assert.deepEqual(water.runes.map(({letter,angle,side,rotation=0})=>[letter,angle,side,rotation]),[
+  ['B',0,'after',0],['B',180,'after',180]
  ]);
  for(const collection of [water.elements,water.runes]){
   for(const item of collection){
@@ -55,4 +55,9 @@ test('Water starter card preserves 180-degree balance on each component track',(
   }
  }
  assert.deepEqual(validateSpell(water),[]);
+});
+
+test('renderer applies optional rune rotation without changing existing default glyphs',()=>{
+ const geometry=readFileSync(new URL('../src/geometry.js',import.meta.url),'utf8');
+ assert.ok(geometry.includes('ctx.rotate((r.rotation||0)*Math.PI/180)'));
 });
