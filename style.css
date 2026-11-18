@@ -176,3 +176,23 @@ main{flex:1 1 auto;width:100%;min-height:0;height:auto;overflow:hidden;grid-temp
  .academy-icon-tile{padding:8px}
  .catalogue .catalogue-icon{width:46px;height:46px;flex-basis:46px}
 }
+
+
+/* Full-size study drawings with browser-safe collection navigation. */
+.academy-collection-page{max-width:1170px}
+.academy-collection{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:stretch}
+.academy-collection-preview{width:100%;min-height:340px;padding:clamp(4px,1vw,14px)}
+#academy-collection-circle{width:min(100%,480px);max-height:min(62dvh,480px);height:auto;aspect-ratio:1}
+.academy-collection-details{align-self:center}
+.academy-collection-selector{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.academy-collection-selector button{font-size:12px;padding:9px 12px}
+.academy-collection-selector button.active{border-color:#ddb876;background:#32372e;color:#f6dea3}
+.academy-lesson-menu{max-width:1050px}
+.academy-lesson-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0}
+.academy-lesson-choice{text-align:left;line-height:1.5;min-height:110px;background:#1b2b32;border-color:#766447;color:#f0dcab}
+@media(max-width:850px){.academy-lesson-choices{grid-template-columns:1fr}.academy-lesson-choice{min-height:62px}}
+@media(max-width:680px){
+ .academy-collection{grid-template-columns:1fr}
+ .academy-collection-preview{min-height:0}
+ #academy-collection-circle{width:min(100%,400px);max-height:min(48dvh,400px)}
+}
