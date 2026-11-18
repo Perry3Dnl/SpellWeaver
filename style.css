@@ -208,3 +208,6 @@ main{flex:1 1 auto;width:100%;min-height:0;height:auto;overflow:hidden;grid-temp
 @keyframes academy-fire-shot{0%{left:26px;opacity:1}85%{opacity:1}100%{left:calc(100% - 45px);opacity:0}}
 .academy-shot-demo small{color:#bfc5cb;font-size:10px}
 @media(prefers-reduced-motion:reduce){.academy-shot-track.firing .academy-shot-fireball{animation:none;left:calc(100% - 45px);opacity:1}}
+
+/* Reserve a natural-height row for the optional projectile demonstration. */
+.academy-class:has(.academy-shot-demo){grid-template-rows:auto minmax(0,1fr) auto auto auto}
