@@ -11,9 +11,10 @@ function balancedWater(){
  const pattern=source(8,[1,1],'Wavy',null);
  pattern.elements[0].angle=90;
  pattern.elements[1].angle=270;
+ pattern.elements[1].rotation=180;
  pattern.runes=[
   {id:1,letter:'B',ringId:1,angle:0,side:'after'},
-  {id:2,letter:'B',ringId:1,angle:180,side:'after'}
+  {id:2,letter:'B',ringId:1,angle:180,side:'after',rotation:180}
  ];
  return pattern;
 }
