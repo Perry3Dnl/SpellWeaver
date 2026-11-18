@@ -196,3 +196,15 @@ main{flex:1 1 auto;width:100%;min-height:0;height:auto;overflow:hidden;grid-temp
  .academy-collection-preview{min-height:0}
  #academy-collection-circle{width:min(100%,400px);max-height:min(48dvh,400px)}
 }
+
+
+/* Classroom projectile is an explicit visual concept, not a casting engine. */
+.academy-shot-demo{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:5px 2px}
+.academy-shot-track{position:relative;flex:1 1 190px;min-width:160px;height:32px;overflow:hidden;border:1px solid #5e5f4e;border-radius:30px;background:#0a2326}
+.academy-shot-origin,.academy-shot-target{position:absolute;top:50%;transform:translateY(-50%);color:#ebc27b;font-size:21px}
+.academy-shot-origin{left:8px}.academy-shot-target{right:8px}
+.academy-shot-fireball{position:absolute;top:50%;left:26px;width:16px;height:16px;transform:translateY(-50%);border-radius:50%;background:radial-gradient(circle,#fff7c7 0%,#ffa23c 40%,#ee4325 78%,transparent 100%);box-shadow:0 0 15px #ef732e,0 0 25px #b24621;opacity:.15}
+.academy-shot-track.firing .academy-shot-fireball{animation:academy-fire-shot 1.2s ease-in forwards}
+@keyframes academy-fire-shot{0%{left:26px;opacity:1}85%{opacity:1}100%{left:calc(100% - 45px);opacity:0}}
+.academy-shot-demo small{color:#bfc5cb;font-size:10px}
+@media(prefers-reduced-motion:reduce){.academy-shot-track.firing .academy-shot-fireball{animation:none;left:calc(100% - 45px);opacity:1}}
