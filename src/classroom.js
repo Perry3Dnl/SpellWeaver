@@ -1,10 +1,11 @@
 import elements from './elements.json' with {type:'json'};
 import {renderSpell} from './geometry.js';
 import {ICON_GROUPS,iconMeta,findGalleryItems,renderComponentIcon} from './icon-gallery.js';
-import {LESSON_STORAGE_KEY,WATER_LESSON_ID,WATER_LESSON_STEPS,lessonSpell,completeWaterLesson,readClassroom} from './lessons.js';
+import {WATER_LESSON_STEPS,lessonSpell,readClassroom} from './lessons.js';
+import {ACADEMY_LESSONS,academySpell,academyCardSpells,completeAcademyLesson} from './academy-lessons.js';
 
 const STORAGE=window.localStorage;
-let step=0;
+let step=0,lessonIndex=0,collectionSelected='mana-study';
 let galleryGroup='elements',gallerySearch='';
 const root=document.createElement('section');
 root.id='academy';
@@ -28,7 +29,7 @@ function show(view){
 function render(view){
  if(view==='menu'){
  root.innerHTML=`<div class="academy-menu"><span class="eyebrow">SPELLWEAVER · ARCANE ACADEMY</span><h1>Choose your path</h1><p>Study the real shapes and components used in the Spell Creator.</p><div class="academy-options"><button id="academy-class"><strong>✧ Classroom</strong><small>Learn magical inscription step by step</small></button><button id="academy-create"><strong>◉ Spell Creator</strong><small>Open the existing inscription workbench</small></button><button id="academy-book"><strong>▣ My Collection</strong><small>Review completed lessons and learned templates</small></button><button id="academy-icons"><strong>◇ All Icons</strong><small>View every actual element, rune, ring and card glyph</small></button></div></div>`;
- root.querySelector('#academy-class').onclick=()=>show('class');
+ root.querySelector('#academy-class').onclick=()=>show('lessons');
  root.querySelector('#academy-create').onclick=()=>show('creator');
  root.querySelector('#academy-book').onclick=()=>show('collection');
  root.querySelector('#academy-icons').onclick=()=>show('icons');
@@ -51,24 +52,80 @@ function render(view){
  paintGallery();
  return;
  }
- if(view==='collection'){
- const progress=readClassroom(STORAGE);
- const unlocked=progress.learnedCards.includes('water');
- root.innerHTML=`<div class="academy-menu academy-collection-page"><span class="eyebrow">THE GRIMOIRE</span><h1>My Collection</h1><p>Spell studies learned in Classroom. Progress is saved in this browser.</p><div class="academy-collection"><div class="academy-collection-preview"><canvas id="academy-collection-circle" width="500" height="500" aria-label="Water starter card rendered with the Spell Creator"></canvas></div><div class="academy-collection-details"><span class="eyebrow">STARTER CARD · V37</span><h2>Water</h2><span class="academy-card-status">${unlocked?'✓ Learned':'Locked · Preview'}</span><p>The same experimental Water inscription taught in Classroom, built from existing Spell Creator components.</p><dl><div><dt>Center</dt><dd>Oxygen</dd></div><div><dt>Ring</dt><dd>Wavy · Oscillation</dd></div><div><dt>Ingredients</dt><dd>Hydrogen × 2 (opposite pair)</dd></div><div><dt>Rune</dt><dd>Bind (B) × 2 (opposite pair)</dd></div></dl><p class="academy-card-note">${unlocked?'Added to your classroom collection.':'Complete the Water foundations lesson to unlock this study card.'} This is a study design, not a validated castable spell.</p><button id="academy-study" class="gold-btn">${unlocked?'Review lesson':'Learn this spell'} →</button></div></div><button id="academy-back">← Main Menu</button></div>`;
- const preview=root.querySelector('#academy-collection-circle');
- renderSpell(preview.getContext('2d'),lessonSpell(WATER_LESSON_STEPS.length-1),elements,{guides:false});
- root.querySelector('#academy-study').onclick=()=>{step=0;show('class')};
- root.querySelector('#academy-back').onclick=()=>show('menu');
- return;
+ if(view==='lessons'){
+  const progress=readClassroom(STORAGE);
+  root.innerHTML=`<div class="academy-menu academy-lesson-menu"><span class="eyebrow">ARCANE ACADEMY / BEGINNER STUDIES</span><h1>Classroom</h1><p>Start with Mana, study Fire, then combine them into an intended projectile. Each lesson builds its inscription step by step.</p><div class="academy-lesson-choices"></div><button id="academy-back">← Main Menu</button></div>`;
+  const list=root.querySelector('.academy-lesson-choices');
+  ACADEMY_LESSONS.forEach((lesson,index)=>{
+   const choice=document.createElement('button');choice.className='academy-lesson-choice';
+   const done=progress.completedLessons.includes(lesson.id);
+   choice.textContent=lesson.title+' — '+lesson.subtitle+(done?' ✓ Learned':'');
+   choice.onclick=()=>{lessonIndex=index;step=0;show('class')};
+   list.append(choice);
+  });
+  root.querySelector('#academy-back').onclick=()=>show('menu');
+  return;
  }
- const current=WATER_LESSON_STEPS[step];
- const completed=readClassroom(STORAGE).completedLessons.includes(WATER_LESSON_ID);
- root.innerHTML=`<div class="academy-class"><div class="academy-class-top"><button id="academy-back">← Main Menu</button><div><span class="eyebrow">CLASSROOM / LESSON 01</span><h1>Water foundations</h1></div><span class="academy-counter">STEP ${step+1} / ${WATER_LESSON_STEPS.length}</span></div><div class="academy-board"><div class="academy-board-heading"><span>CHALKBOARD · REAL SPELL CREATOR GEOMETRY</span><span>V37</span></div><canvas id="academy-circle" width="500" height="500" aria-label="Current Water inscription construction"></canvas><div class="academy-board-foot">${current.title}</div></div><div class="academy-dialogue"><div class="academy-professor" aria-hidden="true">✧</div><div><strong>Professor Aldric</strong><p>${current.dialog}</p></div></div><div class="academy-controls"><button id="academy-prev" ${step===0?'disabled':''}>← Previous</button><div class="academy-progress" aria-label="Lesson progress">${WATER_LESSON_STEPS.map((_,i)=>`<span class="${i<=step?'active':''}"></span>`).join('')}</div><button id="academy-next" class="gold-btn">${step===WATER_LESSON_STEPS.length-1?'Complete lesson':'Next →'}</button></div>${completed?'<p class="academy-finished">✓ Water study card learned. Open My Collection to review.</p>':''}</div>`;
+ if(view==='collection'){
+  const progress=readClassroom(STORAGE);
+  const cards=academyCardSpells().map(({lesson,spell})=>({id:lesson.cardId,name:lesson.name,spell,lessonId:lesson.id}));
+  cards.push({id:'water',name:'Water',spell:lessonSpell(WATER_LESSON_STEPS.length-1),lessonId:null});
+  const selected=cards.find(card=>card.id===collectionSelected)||cards[0];
+  const learned=progress.learnedCards.includes(selected.id);
+  root.innerHTML=`<div class="academy-menu academy-collection-page"><span class="eyebrow">THE GRIMOIRE</span><h1>My Collection</h1><p>Study inscriptions learned through Classroom, with real Spell Creator drawings.</p><div id="academy-collection-selector" class="academy-collection-selector"></div><div class="academy-collection"><div class="academy-collection-preview"><canvas id="academy-collection-circle" width="500" height="500" aria-label="Spell study rendered with Spell Creator"></canvas></div><div class="academy-collection-details"><span class="eyebrow">STUDY SPELL · V37</span><h2 id="academy-collection-name"></h2><span class="academy-card-status">${learned?'✓ Learned':'Locked · Preview'}</span><p id="academy-collection-description"></p><p class="academy-card-note">These are experimental design inscriptions, not validated castable spells. Projectile movement is not implemented.</p><button id="academy-study" class="gold-btn">${learned?'Review lesson':'Learn this spell'} →</button></div></div><button id="academy-back">← Main Menu</button></div>`;
+  const selector=root.querySelector('#academy-collection-selector');
+  for(const card of cards){
+   const button=document.createElement('button');
+   button.textContent=card.name+(progress.learnedCards.includes(card.id)?' ✓':' · Preview');
+   button.classList.toggle('active',card.id===selected.id);
+   button.onclick=()=>{collectionSelected=card.id;render('collection')};
+   selector.append(button);
+  }
+  root.querySelector('#academy-collection-name').textContent=selected.name;
+  root.querySelector('#academy-collection-description').textContent=selected.id==='mana-study'?
+   'Mana center, Smooth ring, and opposing Hold runes.':
+   selected.id==='fire-study'?'Carbon, Oxygen pair, Burst-mark ring, and opposing Focus runes.':
+   selected.id==='fire-mana-projectile'?'Mana center, opposing Fire starter cards, Burst-mark ring and Redirect rune pair; intended to shoot a Fire projectile.':
+   'Oxygen center, Wavy ring, opposing Hydrogen and Bind pairs.';
+  const preview=root.querySelector('#academy-collection-circle');
+  renderStudyPreview(preview,selected.spell);
+  root.querySelector('#academy-study').onclick=()=>{
+   lessonIndex=selected.lessonId?ACADEMY_LESSONS.findIndex(lesson=>lesson.id===selected.lessonId):0;
+   step=0;show(selected.lessonId?'class':'lessons');
+  };
+  root.querySelector('#academy-back').onclick=()=>show('menu');
+  return;
+ }
+ const lesson=ACADEMY_LESSONS[lessonIndex];
+ const current=lesson.steps[step];
+ const completed=readClassroom(STORAGE).completedLessons.includes(lesson.id);
+ root.innerHTML=`<div class="academy-class"><div class="academy-class-top"><button id="academy-back">← Lessons</button><div><span class="eyebrow">CLASSROOM / ${lesson.title}</span><h1>${lesson.name}</h1></div><span class="academy-counter">STEP ${step+1} / ${lesson.steps.length}</span></div><div class="academy-board"><div class="academy-board-heading"><span>CHALKBOARD · ACTUAL SPELL CREATOR GEOMETRY</span><span>V37</span></div><canvas id="academy-circle" width="500" height="500" aria-label="Current classroom spell construction"></canvas><div class="academy-board-foot">${current.title}</div></div><div class="academy-dialogue"><div class="academy-professor" aria-hidden="true">✧</div><div><strong>Professor Aldric</strong><p>${current.dialog}</p></div></div><div class="academy-controls"><button id="academy-prev" ${step===0?'disabled':''}>← Previous</button><div class="academy-progress" aria-label="Lesson progress">${lesson.steps.map((_,i)=>`<span class="${i<=step?'active':''}"></span>`).join('')}</div><button id="academy-next" class="gold-btn">${step===lesson.steps.length-1?'Complete lesson':'Next →'}</button></div>${completed?'<p class="academy-finished">✓ Study completed. This design is in My Collection.</p>':''}</div>`;
  const canvas=root.querySelector('#academy-circle');
- renderSpell(canvas.getContext('2d'),lessonSpell(step),elements,{guides:false});
- root.querySelector('#academy-back').onclick=()=>show('menu');
+ renderStudyPreview(canvas,academySpell(lesson.id,step));
+ root.querySelector('#academy-back').onclick=()=>show('lessons');
  root.querySelector('#academy-prev').onclick=()=>{step=Math.max(0,step-1);render('class')};
- root.querySelector('#academy-next').onclick=()=>{if(step===WATER_LESSON_STEPS.length-1){try{completeWaterLesson(STORAGE);show('collection')}catch{root.querySelector('.academy-dialogue p').textContent='Browser storage is unavailable; progress could not be saved.'}}else{step++;render('class')}};
+ root.querySelector('#academy-next').onclick=()=>{
+  if(step===lesson.steps.length-1){
+   try{completeAcademyLesson(STORAGE,lesson.id);collectionSelected=lesson.cardId;show('collection')}
+   catch{root.querySelector('.academy-dialogue p').textContent='Browser storage is unavailable; progress could not be saved.'}
+  }else{step++;render('class')}
+ };
+}
+function renderStudyPreview(canvas,spell){
+ const ctx=canvas.getContext('2d');
+ // Scale around the actual ink bounds rather than the empty 500px editor workspace.
+ const radii=spell.rings.map(r=>r.radius);
+ const host=id=>spell.rings.find(r=>r.id===id)?.radius||0;
+ const furthest=Math.max(38,...radii,
+  ...spell.runes.map(r=>host(r.ringId)+38),
+  ...spell.elements.map(e=>host(e.ringId)+22*(e.scale||1)),
+  ...(spell.cards||[]).map(card=>host(card.ringId)+(120*(card.scale||1))));
+ const scale=Math.min(2.25,224/furthest);
+ ctx.setTransform(1,0,0,1,0,0);
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ ctx.translate(250,250);ctx.scale(scale,scale);ctx.translate(-250,-250);
+ renderSpell(ctx,spell,elements,{guides:false});
+ ctx.setTransform(1,0,0,1,0,0);
 }
 function paintGallery(){
  const grid=root.querySelector('#academy-icon-grid');
