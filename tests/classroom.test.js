@@ -9,15 +9,18 @@ test('classroom uses exact existing Water starter geometry and rune',()=>{
  const actual=lessonSpell(WATER_LESSON_STEPS.length-1);
  for(const part of ['center','rings','elements','runes','amps','strokes','cards'])assert.deepEqual(actual[part],expected[part]);
  assert.equal(actual.rings[0].pattern,'Wavy');
- assert.equal(actual.runes[0].letter,'B');
+ assert.deepEqual(actual.elements.map(item=>[item.elementId,item.angle]),[[1,90],[1,270]]);
+ assert.deepEqual(actual.runes.map(item=>[item.letter,item.angle]),[['B',0],['B',180]]);
  assert.equal(waterLessonValid(),true);
 });
 test('Next reveals canonical Water components incrementally without altering starter card',()=>{
  assert.equal(lessonSpell(0).rings.length,0);
  assert.equal(lessonSpell(1).rings.length,1);
- for(let n=2;n<=4;n++)assert.equal(lessonSpell(n).elements.length,n-1);
- assert.equal(lessonSpell(4).runes.length,0);
- assert.equal(lessonSpell(5).runes.length,1);
+ assert.equal(lessonSpell(2).elements.length,1);
+ for(let n=3;n<=6;n++)assert.equal(lessonSpell(n).elements.length,2);
+ assert.equal(lessonSpell(3).runes.length,0);
+ assert.equal(lessonSpell(4).runes.length,1);
+ assert.equal(lessonSpell(5).runes.length,2);
  assert.throws(()=>lessonSpell(-1),RangeError);
 });
 test('completion persists one collection item and is idempotent',()=>{
