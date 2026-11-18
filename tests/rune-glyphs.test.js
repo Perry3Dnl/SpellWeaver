@@ -23,7 +23,7 @@ test('all 26 v37 runes have distinct illustrated geometry, not repeated generic 
    const coords=stroke.split(' ');
    assert.ok(coords.length>=2,letter+' has empty stroke');
    for(const point of coords){
-    assert.match(point,/^-?\\d+,-?\\d+$/);
+    assert.equal(point.split(',').length,2,'Each glyph coordinate has x,y');
     const [x,y]=point.split(',').map(Number);
     assert.ok(Math.abs(x)<=11&&Math.abs(y)<=11,letter+' outside icon bounds');
    }
