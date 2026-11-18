@@ -33,3 +33,26 @@ test('catalogue, placement, renderer, recording and deletion use embedded cards'
  assert.match(geom,/card\.template\.source/);
  assert.match(geom,/drawInk\(ctx,card\.template\.source/);
 });
+
+test('Water starter card preserves 180-degree balance on each component track',()=>{
+ const water=STARTER_CARDS.find(card=>card.id==='water').source;
+ assert.equal(water.center.id,8,'Oxygen is the central atom');
+ assert.equal(water.rings[0].pattern,'Wavy');
+ assert.deepEqual(water.elements.map(({elementId,angle,scale,rotation})=>[elementId,angle,scale,rotation]),[
+  [1,90,.72,0],[1,270,.72,0]
+ ]);
+ assert.deepEqual(water.runes.map(({letter,angle,side})=>[letter,angle,side]),[
+  ['B',0,'after'],['B',180,'after']
+ ]);
+ for(const collection of [water.elements,water.runes]){
+  for(const item of collection){
+   const partner=collection.find(other=>other!==item &&
+    other.angle===(item.angle+180)%360 &&
+    (item.elementId===undefined||other.elementId===item.elementId) &&
+    (item.letter===undefined||other.letter===item.letter) &&
+    (item.side===undefined||other.side===item.side));
+   assert.ok(partner,`Missing opposite companion at ${item.angle} degrees`);
+  }
+ }
+ assert.deepEqual(validateSpell(water),[]);
+});
