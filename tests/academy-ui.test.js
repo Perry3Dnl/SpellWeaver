@@ -20,6 +20,7 @@ test('the menu opens a rendered Water preview, lesson, and existing creator',asy
   querySelector(selector){return this.children?.get(selector.slice(1))??null},
   after(child){root=child},
   addEventListener(){},
+  setAttribute(){},
   prepend(){}
  });
  const header=element(),nav=element(),editor=element(),exportButton=element();
