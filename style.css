@@ -51,3 +51,94 @@
 /* Preserve access to Main Menu on narrow browsers while inside Spell Creator. */
 @media(max-width:850px){header nav{display:flex;gap:0}header nav span{display:none}#academy-nav{font-size:11px;padding:8px}}
 @media(max-width:400px){.head-right{gap:4px}header{gap:7px;padding:0 8px}.brand{gap:7px}.brandmark{width:30px;height:30px;font-size:21px}}
+
+
+/* Viewport-safe layout: keep navigation on screen and scroll only the content
+   area when the device is too small to show every editor control at once. */
+html{height:100%;width:100%;overflow:hidden}
+body{height:100vh;height:100dvh;min-height:0;width:100%;display:flex;flex-direction:column;overflow:hidden}
+header{flex:0 0 74px;min-width:0;width:100%;padding-inline:clamp(8px,2vw,28px)}
+header nav{min-width:0;gap:clamp(8px,2vw,24px)}
+header .brand{min-width:0;flex-shrink:1}
+header .brandmark{flex-shrink:0}
+header .head-right{min-width:0;flex-shrink:0;gap:clamp(4px,1vw,12px)}
+main{flex:1 1 auto;width:100%;min-height:0;height:auto;overflow:hidden;grid-template-columns:clamp(220px,21vw,295px) minmax(0,1fr) clamp(230px,23vw,330px)}
+.workbench{min-height:0;min-width:0;overflow:hidden}
+.canvas-stage{min-height:0;min-width:0}
+.circle-halo{width:min(100%,calc(100dvh - 300px),650px);max-height:100%;min-width:0}
+.circle-halo canvas{display:block;max-width:100%;max-height:100%}
+.sidebar,.inspector{min-height:0;min-width:0;overscroll-behavior:contain}
+#academy{flex:1 1 auto;min-height:0;max-height:100%;overflow:auto;overscroll-behavior:contain;padding:clamp(10px,2vh,26px) clamp(10px,2vw,28px)}
+.academy-menu{max-width:900px;margin:0 auto;padding:clamp(10px,2vw,22px)}
+.academy-menu h1{margin-bottom:clamp(8px,1.5vh,16px)}
+.academy-options{margin:clamp(14px,3vh,34px) 0}
+.academy-options button{min-height:clamp(92px,17vh,156px)}
+.academy-class{height:100%;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;gap:clamp(5px,1vh,12px)}
+.academy-class-top{margin:0}
+.academy-board{min-width:0;min-height:0;overflow:hidden;padding:clamp(5px,1vh,14px);border-width:clamp(5px,1vh,12px)}
+#academy-circle{display:block;flex:1 1 auto;min-height:0;min-width:0;width:auto;height:100%;max-height:100%;max-width:100%;object-fit:contain}
+.academy-board-foot{flex:0 0 auto;margin:2px 0 0}
+.academy-dialogue{min-height:0;padding:clamp(4px,1vh,12px) 4px}
+.academy-dialogue p{margin:4px 0;line-height:1.45}
+.academy-controls{padding-bottom:clamp(2px,1vh,10px)}
+.academy-collection-page{max-width:960px}
+.academy-collection{display:grid;grid-template-columns:minmax(190px,0.9fr) minmax(0,1.1fr);gap:clamp(12px,2vw,26px);align-items:center;margin:clamp(12px,2vh,25px) 0;padding:clamp(12px,2vw,22px)}
+.academy-collection-preview{display:grid;place-items:center;min-width:0;min-height:0;border:1px solid #536e67;border-radius:10px;background:radial-gradient(circle,#28453d,#0c2522 72%);padding:10px}
+#academy-collection-circle{width:min(100%,300px);height:auto;aspect-ratio:1;max-height:min(42dvh,300px);object-fit:contain;touch-action:auto;cursor:default}
+.academy-collection-details{min-width:0}
+.academy-card-status{display:inline-flex;color:#e4cf96;border:1px solid #8e7853;border-radius:20px;padding:5px 10px;font-size:12px}
+.academy-collection-details dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px;margin:14px 0}
+.academy-collection-details dl div{min-width:0}
+.academy-collection-details dt{color:#d7bb84;font-size:11px}
+.academy-collection-details dd{margin:3px 0;color:#f1ebdf;font-size:13px;overflow-wrap:anywhere}
+.academy-collection-details p{margin:10px 0;line-height:1.45}
+.academy-collection-details .academy-card-note{font-size:12px;color:#bfc7ca}
+@media(max-width:1100px){
+ main{display:flex;flex-direction:column;overflow:auto;overscroll-behavior:contain}
+ .workbench{order:0;flex:0 0 min(640px,calc(100dvh - 88px));height:auto;min-height:0;overflow:hidden}
+ .sidebar{order:1;overflow:visible;flex:0 0 auto;border-right:0;border-top:1px solid #333}
+ .inspector{order:2;overflow:visible;flex:0 0 auto;border-left:0;border-top:1px solid #333}
+ .canvas-stage{min-height:0;flex:1 1 auto}
+ .circle-halo{width:min(100%,calc(100dvh - 300px),440px)}
+ .catalogue{max-height:220px}
+}
+@media(max-width:680px){
+ header{flex-basis:65px}
+ #academy{padding:8px}
+ .academy-collection{grid-template-columns:1fr}
+ #academy-collection-circle{max-height:min(30dvh,250px)}
+ .academy-collection-preview{padding:5px}
+ .academy-class{height:auto;min-height:100%;display:flex;flex-direction:column}
+ .academy-board{flex:1 1 auto;min-height:190px}
+ #academy-circle{width:min(100%,calc(100dvh - 350px),360px);height:auto;max-height:100%;flex:0 1 auto}
+ .academy-dialogue{flex:0 0 auto}
+ .academy-controls{flex:0 0 auto}
+ .workbench{flex-basis:min(610px,calc(100dvh - 75px))}
+ .circle-halo{width:min(100%,calc(100dvh - 270px),420px)}
+ .academy-collection-details dl{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:480px){
+ header{gap:5px}
+ header .brand{gap:5px}
+ header .brand strong{font-size:12px;letter-spacing:.3px}
+ header .brand small{display:none}
+ header .brandmark{width:27px;height:27px;font-size:19px}
+ #academy-nav{padding:7px;font-size:10px}
+ #export-top{font-size:9px;padding:7px 5px}
+ .workbench{padding:12px 8px}
+ .canvas-toolbar h1{font-size:15px}
+ .toolgroup{gap:3px}
+ .toolgroup button{font-size:9px;padding:5px}
+ .selection-mode{display:none}
+ .stage-label{font-size:8px}
+ .academy-dialogue p{font-size:13px}
+ .academy-dialogue strong{font-size:12px}
+ .academy-class-top h1{font-size:21px}
+}
+@media(max-height:650px) and (min-width:681px){
+ .academy-class{height:auto;min-height:100%;display:flex;flex-direction:column}
+ .academy-board{flex:0 0 auto}
+ #academy-circle{width:min(100%,300px);height:auto}
+ .academy-dialogue{min-height:0}
+ .circle-halo{width:min(100%,calc(100dvh - 235px),450px)}
+}
