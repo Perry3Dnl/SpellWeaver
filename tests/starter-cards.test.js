@@ -59,5 +59,5 @@ test('Water starter card preserves 180-degree balance on each component track',(
 
 test('renderer applies optional rune rotation without changing existing default glyphs',()=>{
  const geometry=readFileSync(new URL('../src/geometry.js',import.meta.url),'utf8');
- assert.match(geometry,/ctx\\.rotate\\(\\(r\\.rotation\\|\\|0\\)\\*Math\\.PI\\/180\\)/);
+ assert.ok(geometry.includes('ctx.rotate((r.rotation||0)*Math.PI/180)'));
 });
