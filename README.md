@@ -103,3 +103,15 @@ These shapes are **procedural and bundled**, not remote icon images; if a rune a
 The shared canvas renderer now gives each of the 26 rune meanings its own bespoke **abstract magical sigil** (not a Latin letter) instead of cycling through five repeated polygons. The All Icons reference page, Spell Creator component catalogue, classroom, starter cards, and full inscription canvas all use the same mapping in `src/geometry.js`. Runes remain **provisional**, not finalized canonical spell signatures. The icon atlas scrolls within the browser viewport; on smaller windows scroll down to see all 26 entries, including Y and Z. Regression tests check unique geometry, bounded coordinates, and atlas/editor parity.
 
 The individual A–Z designators name runes in code and UI only. Their rendered glyphs use abstract line motifs, not the English alphabet. They remain provisional drawings until the game-design document approves canonical stroke geometry.
+
+## Classroom sequence: Mana, Fire, then Fire Mana Projectile
+
+The classroom now presents three ordered beginner studies (previous studies are kept in the browser's existing progress store). Each class uses a fixed, stepwise dialogue and the shared v37 Spell Creator renderer:
+
+1. **Mana Study:** existing Mana element (id 119) as the center, neutral Smooth ring, and paired Hold runes.
+2. **Fire Element Study:** Carbon center, opposing Oxygen constituents, Burst-mark ring and paired Focus runes. Fire remains an **experimental motif**, not a separately defined magical/chemical element.
+3. **Fire Mana Projectile:** Mana center and Burst-mark ring, opposing embedded copies of the existing Fire starter card, and paired Redirect runes. The final lesson includes a **visual-only animated projectile concept**. The game does not currently implement actual projectile physics, targeting, damage, or executable casts.
+
+Only completed lessons unlock their respective study designs. New lessons can be taken in order; previous Water progress and card are preserved. Completion is idempotently saved under the existing localStorage key, not to the server. The final spell is structurally valid but its promised shooting behavior is not yet implemented.
+
+My Collection can display Mana Study, Fire Element Study, Fire Mana Projectile, and legacy Water. The preview automatically zooms the real inscription to fit its canvas based on ring, rune, element and embedded-card extents, instead of leaving most of the 500×500 editor workspace empty. Larger responsive canvas bounds allow a much more readable spell without clipping on narrow displays.
