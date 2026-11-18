@@ -40,7 +40,7 @@ test('the menu opens a rendered Water preview, lesson, and existing creator',asy
   root.querySelector('#academy-book').onclick();
   assert.match(root.innerHTML,/id="academy-collection-circle"/);
   assert.match(root.innerHTML,/Locked · Preview/);
-  assert.match(root.innerHTML,/Mana/);
+  assert.equal(root.querySelector('#academy-collection-name').textContent,'Mana Study');
   assert.match(root.innerHTML,/academy-collection-selector/);
   assert.ok(strokes>0,'the shared geometry renderer draws the actual Water inscription');
   root.querySelector('#academy-study').onclick();
@@ -50,7 +50,7 @@ test('the menu opens a rendered Water preview, lesson, and existing creator',asy
   root.querySelector('#academy-back').onclick();
   root.querySelector('#academy-back').onclick();
   root.querySelector('#academy-book').onclick();
-  assert.match(root.innerHTML,/Mana Study/);
+  assert.equal(root.querySelector('#academy-collection-name').textContent,'Mana Study');
   root.querySelector('#academy-back').onclick();
   root.querySelector('#academy-create').onclick();
   assert.equal(editor.hidden,false);
