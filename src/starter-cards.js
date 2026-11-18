@@ -5,9 +5,21 @@ const source=(center,ingredients,ring='Smooth',rune='F')=>({
  runes:rune?[{id:1,letter:rune,ringId:1,angle:45,side:'after'}]:[],
  amps:[],strokes:[],cards:[]
 });
+// Keep the Water study inscription rotationally balanced: the Oxygen center is
+// already the oxygen component, while Hydrogen and Bind occupy opposite pairs.
+function balancedWater(){
+ const pattern=source(8,[1,1],'Wavy',null);
+ pattern.elements[0].angle=90;
+ pattern.elements[1].angle=270;
+ pattern.runes=[
+  {id:1,letter:'B',ringId:1,angle:0,side:'after'},
+  {id:2,letter:'B',ringId:1,angle:180,side:'after'}
+ ];
+ return pattern;
+}
 export const STARTER_CARDS=[
  {id:'fire',name:'Fire',ingredients:['Carbon','Oxygen','Focus'],description:'Experimental fuel and oxygen pattern; ignition behavior not yet confirmed.',source:source(6,[8,8,6],'Burst-mark','F')},
- {id:'water',name:'Water',ingredients:['Hydrogen','Oxygen','Bind'],description:'Experimental hydrogen–oxygen water motif; chemical synthesis is not yet a magic rule.',source:source(8,[1,1,8],'Wavy','B')},
+ {id:'water',name:'Water',ingredients:['Hydrogen','Oxygen','Bind'],description:'Experimental hydrogen–oxygen water motif; chemical synthesis is not yet a magic rule.',source:balancedWater()},
  {id:'ice',name:'Ice',ingredients:['Hydrogen','Oxygen','Hold'],description:'Experimental water constituents in a containment pattern; cooling behavior unverified.',source:source(8,[1,1,8],'Squared','H')},
  {id:'lava',name:'Lava',ingredients:['Silicon','Oxygen','Carbon'],description:'Experimental silicate and heat-theme composition, not a guaranteed lava spell.',source:source(14,[8,8,6],'Burst-mark','F')},
  {id:'steam',name:'Steam',ingredients:['Hydrogen','Oxygen','Expand'],description:'Experimental volatile water expression; no confirmed steam reaction yet.',source:source(8,[1,1,8],'Wavy','E')},
